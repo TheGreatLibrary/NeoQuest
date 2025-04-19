@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:neoflex_quiz/screens/order_screen.dart';
 import 'package:neoflex_quiz/widgets/base_scaffold.dart';
 import 'package:intl/intl.dart';
+import 'package:neoflex_quiz/widgets/constrained_box.dart';
 import 'package:neoflex_quiz/widgets/custom_bottom_bar.dart';
 import 'package:provider/provider.dart';
 import '../database/models/cart_item.dart';
@@ -132,9 +133,11 @@ class _OrderPlacementScreenState extends State<OrderPlacementScreen> {
                       getDateTime(1),
                       getDateTime(2),
                       widget.totalPrice + 10);
+
                   /// обновление состояния аккаунта пользователя
                   context.read<CoinProvider>().updateCoins();
                   final cart = context.read<CartProvider>();
+
                   /// очистка корзины и обновление ее
                   cart.checkCart();
                   cart.loadCart();
@@ -171,7 +174,8 @@ class _OrderPlacementScreenState extends State<OrderPlacementScreen> {
 
   /// метод для получения текущей даты
   String getCurrentDateTime() {
-    return DateFormat('dd.MM.yyyy HH:mm:ss').format(DateTime.now()); // Например, 25.03.2025 14:30:00
+    return DateFormat('dd.MM.yyyy HH:mm:ss')
+        .format(DateTime.now()); // Например, 25.03.2025 14:30:00
   }
 
   /// метод для получения даты с каким-то добавочным числом
@@ -188,13 +192,15 @@ class _OrderPlacementScreenState extends State<OrderPlacementScreen> {
     return BaseScaffold(
       title: "Заказ",
       showLeading: true,
-      body: SafeArea(
+      body: CustomConstrainedBox(
         child: Column(
           children: [
             Expanded(
               child: SingleChildScrollView(
-                keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [

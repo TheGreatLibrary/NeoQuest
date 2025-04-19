@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:neoflex_quiz/providers/orders_provider.dart';
 import 'package:neoflex_quiz/providers/selected_index_page.dart';
+import 'package:neoflex_quiz/widgets/constrained_box.dart';
 import 'package:provider/provider.dart';
 
 import 'widgets/base_scaffold.dart';
@@ -17,6 +18,7 @@ class MainPage extends StatefulWidget {
   @override
   State<MainPage> createState() => _MainPageState();
 }
+
 class _MainPageState extends State<MainPage> {
   /// список с экранами
   late final List<Widget> _screens;
@@ -75,7 +77,8 @@ class _MainPageState extends State<MainPage> {
     _screens[selectedIndex] = _buildScreen(selectedIndex);
 
     return BaseScaffold(
-      body: Stack(
+      body: CustomConstrainedBox(
+          child: Stack(
         children: [
           Positioned.fill(
             child: _AnimatedScreenSwitcher(
@@ -85,7 +88,7 @@ class _MainPageState extends State<MainPage> {
           ),
           if (!isKeyboardOpen) const _CustomBottomNavBar(),
         ],
-      ),
+      )),
       showLeading: false,
     );
   }
@@ -124,6 +127,7 @@ class _AnimatedScreenSwitcher extends StatelessWidget {
 /// класс навигационной панели
 class _CustomBottomNavBar extends StatelessWidget {
   const _CustomBottomNavBar();
+
   @override
   Widget build(BuildContext context) {
     return Positioned(
@@ -230,6 +234,7 @@ class _KeepAliveWrapper extends StatefulWidget {
   @override
   State<_KeepAliveWrapper> createState() => _KeepAliveWrapperState();
 }
+
 class _KeepAliveWrapperState extends State<_KeepAliveWrapper>
     with AutomaticKeepAliveClientMixin {
   @override

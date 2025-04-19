@@ -1,5 +1,6 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:neoflex_quiz/widgets/constrained_box.dart';
 import 'package:neoflex_quiz/widgets/gradient_button.dart';
 import 'package:neoflex_quiz/widgets/shimmer_widget.dart';
 import 'package:provider/provider.dart';
@@ -50,42 +51,44 @@ class StoryScreen extends StatelessWidget {
                               height: null,
                               delay: 300),
                 ),
-                Stack(
-                  children: [
-                    const Positioned(
-                      right: 0,
-                      top: 0,
-                      left: 0,
-                      bottom: 150,
-                      child: Center(
-                        child: _FloatingRobot(),
+                CustomConstrainedBox(
+                  child: Stack(
+                    children: [
+                      const Positioned(
+                        right: 0,
+                        top: 0,
+                        left: 0,
+                        bottom: 150,
+                        child: Center(
+                          child: _FloatingRobot(),
+                        ),
                       ),
-                    ),
-                    ChangeNotifierProvider(
-                      create: (_) => StoryProvider(id, title),
-                      child: Consumer<StoryProvider>(
-                          builder: (context, provider, child) {
-                        return provider.isLoading
-                            ? const _ShimmerStoryPage()
+                      ChangeNotifierProvider(
+                        create: (_) => StoryProvider(id, title),
+                        child: Consumer<StoryProvider>(
+                            builder: (context, provider, child) {
+                          return provider.isLoading
+                              ? const _ShimmerStoryPage()
                               //const Center(child: CircularProgressIndicator())
-                            : provider.stories.isEmpty
-                                ? const _PlaceHolderStoryPage()
-                                //const SizedBox()
-                                : PageView.builder(
-                                    controller: provider.pageController,
-                                    physics: NeverScrollableScrollPhysics(),
-                                    itemCount: provider.stories.length,
-                                    itemBuilder: (context, index) {
-                                      return _StoryPage(
-                                        story: provider.stories[index],
-                                        onNext: () async =>
-                                            await provider.nextDialog(context),
-                                      );
-                                    },
-                                  );
-                      }),
-                    ),
-                  ],
+                              : provider.stories.isEmpty
+                                  ? const _PlaceHolderStoryPage()
+                                  //const SizedBox()
+                                  : PageView.builder(
+                                      controller: provider.pageController,
+                                      physics: NeverScrollableScrollPhysics(),
+                                      itemCount: provider.stories.length,
+                                      itemBuilder: (context, index) {
+                                        return _StoryPage(
+                                          story: provider.stories[index],
+                                          onNext: () async => await provider
+                                              .nextDialog(context),
+                                        );
+                                      },
+                                    );
+                        }),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             )));
@@ -95,22 +98,23 @@ class StoryScreen extends StatelessWidget {
 /// шиммер заглушка при загрузке
 class _ShimmerStoryPage extends StatelessWidget {
   const _ShimmerStoryPage();
+
   @override
   Widget build(BuildContext context) {
     return Stack(
-          children: [
-            Positioned.fill(
-              child: Container(color: Colors.transparent),
-            ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                  padding: const EdgeInsets.only(left: 16, right: 16),
-                  child: ShimmerWidget.rectangular(height: MediaQuery.of(context).size.height / 2.2),
-              )
-            ),
-          ],
-        );
+      children: [
+        Positioned.fill(
+          child: Container(color: Colors.transparent),
+        ),
+        Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 16, right: 16),
+              child: ShimmerWidget.rectangular(
+                  height: MediaQuery.of(context).size.height / 2.2),
+            )),
+      ],
+    );
   }
 }
 
@@ -121,60 +125,58 @@ class _PlaceHolderStoryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(
-          children: [
-            Positioned.fill(
-              child: Container(color: Colors.transparent),
-            ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                  padding: const EdgeInsets.only(left: 16, right: 16),
-                  child: Container(
-                      height: MediaQuery.of(context).size.height / 2.2,
-                      padding: const EdgeInsets.only(
-                          left: 24, right: 24, top: 16, bottom: 24),
-                      decoration: ShapeDecoration(
-                        color: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Positioned.fill(
+          child: Container(color: Colors.transparent),
+        ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: Padding(
+              padding: const EdgeInsets.only(left: 16, right: 16),
+              child: Container(
+                  height: MediaQuery.of(context).size.height / 2.2,
+                  padding: const EdgeInsets.only(
+                      left: 24, right: 24, top: 16, bottom: 24),
+                  decoration: ShapeDecoration(
+                    color: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Нео ',
-                                  style:
-                                  Theme.of(context).textTheme.titleSmall),
-                              Container(
-                                margin: EdgeInsets.symmetric(vertical: 16),
-                                width: double.infinity,
-                                decoration: const ShapeDecoration(
-                                  shape: RoundedRectangleBorder(
-                                    side: BorderSide(
-                                      width: 1,
-                                      strokeAlign: BorderSide.strokeAlignCenter,
-                                      color: Color(0xFFD1005B),
-                                    ),
-                                  ),
+                          Text('Нео ',
+                              style: Theme.of(context).textTheme.titleSmall),
+                          Container(
+                            margin: EdgeInsets.symmetric(vertical: 16),
+                            width: double.infinity,
+                            decoration: const ShapeDecoration(
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 1,
+                                  strokeAlign: BorderSide.strokeAlignCenter,
+                                  color: Color(0xFFD1005B),
                                 ),
                               ),
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 16),
-                                child: Text("У меня нет слов")
-                              ),
-                            ],
+                            ),
                           ),
+                          Padding(
+                              padding: const EdgeInsets.only(bottom: 16),
+                              child: Text("У меня нет слов")),
                         ],
-                      ))),
-            ),
-          ],
-        );
+                      ),
+                    ],
+                  ))),
+        ),
+      ],
+    );
   }
 }
 
@@ -281,7 +283,8 @@ class _FloatingRobot extends StatefulWidget {
   _FloatingRobotState createState() => _FloatingRobotState();
 }
 
-class _FloatingRobotState extends State<_FloatingRobot> with TickerProviderStateMixin {
+class _FloatingRobotState extends State<_FloatingRobot>
+    with TickerProviderStateMixin {
   late final AnimationController _floatController;
   late final Animation<double> _floatAnimation;
 
@@ -300,7 +303,6 @@ class _FloatingRobotState extends State<_FloatingRobot> with TickerProviderState
       duration: Duration(seconds: 2, milliseconds: 100),
       vsync: this,
     )..repeat(reverse: true);
-
 
     _floatAnimation = Tween<double>(begin: -2, end: 6).animate(
       CurvedAnimation(parent: _floatController, curve: Curves.easeInOut),
@@ -355,7 +357,6 @@ class _FloatingRobotState extends State<_FloatingRobot> with TickerProviderState
     );
   }
 }
-
 
 // неудовлетворительный эксперимент с заменой анимации на webp анимацию. слишком много весит при таком качестве
 // class RobotRecorderWebP extends StatefulWidget {

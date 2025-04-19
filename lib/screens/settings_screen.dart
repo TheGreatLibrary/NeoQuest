@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:neoflex_quiz/providers/providers.dart';
+import 'package:neoflex_quiz/widgets/constrained_box.dart';
 import 'package:neoflex_quiz/widgets/gradient_button.dart';
 import 'package:provider/provider.dart';
 
@@ -128,7 +129,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return BaseScaffold(
         title: "Настройки",
         showLeading: true,
-        body: Stack(
+        body: CustomConstrainedBox(
+            child: Stack(
           children: [
             Positioned.fill(
               child: SafeArea(
@@ -179,6 +181,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               )
           ],
-        ));
+        )));
   }
 }

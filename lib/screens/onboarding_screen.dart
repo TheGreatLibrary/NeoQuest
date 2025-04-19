@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:neoflex_quiz/providers/providers.dart';
 import 'package:neoflex_quiz/screens/account_screen.dart';
 import 'package:neoflex_quiz/widgets/base_scaffold.dart';
+import 'package:neoflex_quiz/widgets/constrained_box.dart';
 import 'package:neoflex_quiz/widgets/custom_check_box.dart';
 import 'package:neoflex_quiz/widgets/gradient_button.dart';
 import 'package:neoflex_quiz/widgets/gradient_text.dart';
@@ -14,7 +15,6 @@ import '../providers/onboarding_provider.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/custom_top_dialog.dart';
 import '../widgets/delay_loading_image.dart';
-
 
 /// онбординг приложения
 class OnboardingScreen extends StatelessWidget {
@@ -35,13 +35,13 @@ class OnboardingScreen extends StatelessWidget {
       const _OnboardingPage(
         title: "Открой мир Neoflex",
         subtitle:
-        "Здесь всё, что тебе нужно: история, секреты компании и лёгкий способ разобраться, как тут всё устроено.",
+            "Здесь всё, что тебе нужно: история, секреты компании и лёгкий способ разобраться, как тут всё устроено.",
         image: 'assets/image/onboard2.png',
       ),
       const _OnboardingPage(
         title: "Играй, учись, получай!",
         subtitle:
-        "Здесь не только история, но и игра! Проходи квизы, копи баллы и забирай мерч. Начнем?",
+            "Здесь не только история, но и игра! Проходи квизы, копи баллы и забирай мерч. Начнем?",
         image: 'assets/image/onboard3.png',
       ),
       const _RegistrationPage()
@@ -49,7 +49,8 @@ class OnboardingScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Padding(
+      body: CustomConstrainedBox(
+          child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: PageView.builder(
           controller: provider.controller,
@@ -57,7 +58,7 @@ class OnboardingScreen extends StatelessWidget {
           itemCount: pages.length,
           itemBuilder: (_, index) => pages[index],
         ),
-      ),
+      )),
     );
   }
 }
@@ -98,7 +99,10 @@ class _ProgressIndicatorWidget extends StatelessWidget {
                 LayoutBuilder(
                   builder: (context, constraints) {
                     return Container(
-                      width: constraints.maxWidth * (context.read<OnboardingProvider>().currentIndex + 1) / 3,
+                      width: constraints.maxWidth *
+                          (context.read<OnboardingProvider>().currentIndex +
+                              1) /
+                          3,
                       height: 8,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
@@ -129,7 +133,8 @@ class _GradientNextButton extends StatelessWidget {
     final provider = context.read<OnboardingProvider>();
     return GradientButton(
       onPressed: provider.nextPage,
-      buttonText: provider.currentIndex == 2 ? "Начать путешествие" : "Продолжить",
+      buttonText:
+          provider.currentIndex == 2 ? "Начать путешествие" : "Продолжить",
       gradient: const LinearGradient(
         begin: Alignment(-1.00, 0.00),
         end: Alignment(1, 0),
@@ -166,7 +171,11 @@ class _OnboardingPage extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.max,
               children: [
-                GradientText(text: title, align: TextAlign.center, gradient: const [Color(0xFFD1005B), Color(0xFFE8772F)], style: Theme.of(context).textTheme.displayMedium!),
+                GradientText(
+                    text: title,
+                    align: TextAlign.center,
+                    gradient: const [Color(0xFFD1005B), Color(0xFFE8772F)],
+                    style: Theme.of(context).textTheme.displayMedium!),
                 const SizedBox(height: 16),
                 Text(subtitle,
                     textAlign: TextAlign.center,
@@ -175,7 +184,8 @@ class _OnboardingPage extends StatelessWidget {
               ],
             ),
           ),
-          DelayLoadingImage(imagePath: image, width: 280, height: 280, delay: 300),
+          DelayLoadingImage(
+              imagePath: image, width: 260, height: 260, delay: 300, fit: BoxFit.scaleDown),
           // OnboardingImage(path: image),
           const SizedBox(height: 80),
           const _GradientNextButton(),
@@ -224,11 +234,16 @@ class _RegistrationHeader extends StatelessWidget {
       child: Column(
         spacing: 15,
         children: [
-          const DelayLoadingImage(imagePath: 'assets/image/onboard4.png', width: 280, height: 280, delay: 300),
+          const DelayLoadingImage(
+              imagePath: 'assets/image/onboard4.png',
+              width: 260, height: 260, delay: 300, fit: BoxFit.scaleDown),
 
-
-         // OnboardingImage(path:'assets/image/onboard4.png'),
-          GradientText(text: "Регистрация", align: TextAlign.center, gradient: const [Color(0xFFD1005B), Color(0xFFE8772F)], style: Theme.of(context).textTheme.displayMedium!),
+          // OnboardingImage(path:'assets/image/onboard4.png'),
+          GradientText(
+              text: "Регистрация",
+              align: TextAlign.center,
+              gradient: const [Color(0xFFD1005B), Color(0xFFE8772F)],
+              style: Theme.of(context).textTheme.displayMedium!),
         ],
       ),
     );
@@ -316,7 +331,8 @@ class _RegistrationFormState extends State<_RegistrationForm> {
         MaterialPageRoute(builder: (_) => MainPage()),
       );
       final title = achievementProvider.achievements[0].title;
-      CustomTopDialog.show(context, 'Получено достижение “$title”', BaseScaffold(body: AccountScreen(), showLeading: false));
+      CustomTopDialog.show(context, 'Получено достижение “$title”',
+          BaseScaffold(body: AccountScreen(), showLeading: false));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -376,16 +392,18 @@ class _RegistrationFormState extends State<_RegistrationForm> {
                         text: 'Я принимаю ',
                         style: Theme.of(context).textTheme.labelSmall),
                     TextSpan(
-                        text: 'условия использования',
-                        style: Theme.of(context)
-                            .textTheme
-                            .labelSmall
-                            ?.copyWith(fontWeight: FontWeight.w700),
+                      text: 'условия использования',
+                      style: Theme.of(context)
+                          .textTheme
+                          .labelSmall
+                          ?.copyWith(fontWeight: FontWeight.w700),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () async {
-                          final url = Uri.parse('https://picnic-bk.ru/alex/neoflex_quiz/terms_of_use.html');
+                          final url = Uri.parse(
+                              'https://picnic-bk.ru/alex/neoflex_quiz/terms_of_use.html');
                           if (await canLaunchUrl(url)) {
-                            await launchUrl(url, mode: LaunchMode.externalApplication);
+                            await launchUrl(url,
+                                mode: LaunchMode.externalApplication);
                           }
                         },
                     ),
@@ -393,16 +411,18 @@ class _RegistrationFormState extends State<_RegistrationForm> {
                         text: ' и ',
                         style: Theme.of(context).textTheme.labelSmall),
                     TextSpan(
-                        text: 'политику конфиденциальности',
-                        style: Theme.of(context)
-                            .textTheme
-                            .labelSmall
-                            ?.copyWith(fontWeight: FontWeight.w700),
+                      text: 'политику конфиденциальности',
+                      style: Theme.of(context)
+                          .textTheme
+                          .labelSmall
+                          ?.copyWith(fontWeight: FontWeight.w700),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () async {
-                          final url = Uri.parse('https://picnic-bk.ru/alex/neoflex_quiz/privacy_policy.html');
+                          final url = Uri.parse(
+                              'https://picnic-bk.ru/alex/neoflex_quiz/privacy_policy.html');
                           if (await canLaunchUrl(url)) {
-                            await launchUrl(url, mode: LaunchMode.externalApplication);
+                            await launchUrl(url,
+                                mode: LaunchMode.externalApplication);
                           }
                         },
                     ),

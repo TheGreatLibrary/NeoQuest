@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:neoflex_quiz/providers/product_provider.dart';
 import 'package:neoflex_quiz/screens/product_screen.dart';
 import 'package:neoflex_quiz/widgets/base_scaffold.dart';
+import 'package:neoflex_quiz/widgets/constrained_box.dart';
 import 'package:provider/provider.dart';
 
 import '../database/models/models.dart';
@@ -35,39 +36,40 @@ class _OrdersScreenState extends State<OrdersScreen> {
     final ordersProvider = context.read<OrdersProvider>();
 
     return BaseScaffold(
-      title: "Заказы",
-      showLeading: true,
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: RefreshIndicator(
-          color: const Color(0xFFE8772F),
-          backgroundColor: Colors.white,
-          onRefresh: () async {
-            await ordersProvider.checkAndUpdateOrders();
-          },
-          child: ordersProvider.isLoading
-              ? const _ShimmerOrderList()
-              : ordersProvider.orders.isEmpty
-                  ? const Center(child: Text("Заказов нет"))
-                  : Consumer<OrdersProvider>(
-                      builder: (context, provider, _) {
-                        /// список заказов
-                        return ListView.builder(
-                          itemCount: provider.orders.length,
-                          padding: const EdgeInsets.only(top: 24),
-                          itemBuilder: (context, index) {
-                            final order = provider.orders[index];
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 16),
-                              child: _OrderItem(order: order),
+        title: "Заказы",
+        showLeading: true,
+        body: CustomConstrainedBox(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: RefreshIndicator(
+              color: const Color(0xFFE8772F),
+              backgroundColor: Colors.white,
+              onRefresh: () async {
+                await ordersProvider.checkAndUpdateOrders();
+              },
+              child: ordersProvider.isLoading
+                  ? const _ShimmerOrderList()
+                  : ordersProvider.orders.isEmpty
+                      ? const Center(child: Text("Заказов нет"))
+                      : Consumer<OrdersProvider>(
+                          builder: (context, provider, _) {
+                            /// список заказов
+                            return ListView.builder(
+                              itemCount: provider.orders.length,
+                              padding: const EdgeInsets.only(top: 24),
+                              itemBuilder: (context, index) {
+                                final order = provider.orders[index];
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 16),
+                                  child: _OrderItem(order: order),
+                                );
+                              },
                             );
                           },
-                        );
-                      },
-                    ),
-        ),
-      ),
-    );
+                        ),
+            ),
+          ),
+        ));
   }
 }
 

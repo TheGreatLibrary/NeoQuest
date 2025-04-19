@@ -38,7 +38,8 @@ class _MarketScreenState extends State<MarketScreen> {
       final cards = provider.products;
       if (cards.isNotEmpty) {
         await Future.wait(cards.map((product) {
-          return precacheImage(AssetImage('assets/image/${product.image}.webp'), context);
+          return precacheImage(
+              AssetImage('assets/image/${product.image}.webp'), context);
         }));
       }
 
@@ -53,61 +54,67 @@ class _MarketScreenState extends State<MarketScreen> {
     return SafeArea(
         child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: CustomScrollView(slivers: [
-              const SliverAppBar(
-                backgroundColor: Colors.white,
-                surfaceTintColor: Colors.white,
-                expandedHeight: 105,
-                floating: true,
-                snap: true,
-                pinned: false,
-                flexibleSpace: _Header(),
-              ),
-              SliverPadding(
-                padding: const EdgeInsets.only(top: 16, bottom: 120),
-                sliver: Builder(
-                  builder: (context) {
-                    final provider = context.watch<ProductProvider>();
-                    final cards = provider.products;
+            child: LayoutBuilder(builder: (context, constraints) {
+              final widthWindow = constraints.maxWidth;
 
-                    /// пока данные грузятся - заглушка
-                    if (provider.isLoading || !_isPrecached) {
-                      return SliverGridMarket(
-                        body: SliverChildBuilderDelegate(
-                          (context, index) => const _ShimmerProductCard(),
-                          childCount: 4,
-                        ),
-                      );
-                    }
-
-                    /// если товаров нет (в результате поиска например), итог
-                    if (cards.isEmpty) {
-                      return const SliverToBoxAdapter(
-                        child: SizedBox(
-                          height: 150,
-                          child: Center(
-                            child: Text("Товары не найдены"),
-                          ),
-                        ),
-                      );
-                    }
-
-                    /// товары
-                    return SliverGridMarket(
-                      body: SliverChildBuilderDelegate(
-                        (context, index) {
-                          return _ProductCard(
-                            key: ValueKey(cards[index].id),
-                            product: cards[index],
-                          );
-                        },
-                        childCount: cards.length,
-                      ),
-                    );
-                  },
+              return CustomScrollView(slivers: [
+                const SliverAppBar(
+                  backgroundColor: Colors.white,
+                  surfaceTintColor: Colors.white,
+                  expandedHeight: 105,
+                  floating: true,
+                  snap: true,
+                  pinned: false,
+                  flexibleSpace: _Header(),
                 ),
-              ),
-            ])));
+                SliverPadding(
+                  padding: const EdgeInsets.only(top: 16, bottom: 120),
+                  sliver: Builder(
+                    builder: (context) {
+                      final provider = context.watch<ProductProvider>();
+                      final cards = provider.products;
+
+                      /// пока данные грузятся - заглушка
+                      if (provider.isLoading || !_isPrecached) {
+                        return SliverGridMarket(
+                          width: widthWindow,
+                          body: SliverChildBuilderDelegate(
+                            (context, index) => const _ShimmerProductCard(),
+                            childCount: 4,
+                          ),
+                        );
+                      }
+
+                      /// если товаров нет (в результате поиска например), итог
+                      if (cards.isEmpty) {
+                        return const SliverToBoxAdapter(
+                          child: SizedBox(
+                            height: 150,
+                            child: Center(
+                              child: Text("Товары не найдены"),
+                            ),
+                          ),
+                        );
+                      }
+
+                      /// товары
+                      return SliverGridMarket(
+                        width: widthWindow,
+                        body: SliverChildBuilderDelegate(
+                          (context, index) {
+                            return _ProductCard(
+                              key: ValueKey(cards[index].id),
+                              product: cards[index],
+                            );
+                          },
+                          childCount: cards.length,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ]);
+            })));
   }
 }
 
@@ -282,17 +289,17 @@ class _SearchTextField extends StatelessWidget {
 
 /// список товаров
 class SliverGridMarket extends StatelessWidget {
+  final double width;
   final SliverChildBuilderDelegate body;
 
-  const SliverGridMarket({super.key, required this.body});
+  const SliverGridMarket({super.key, required this.body, required this.width});
 
   @override
   Widget build(BuildContext context) {
     return SliverGrid(
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount:
-            (MediaQuery.of(context).size.width / 180).floor().clamp(2, 4),
-            childAspectRatio: (MediaQuery.of(context).size.width / 2) / 300,
+            crossAxisCount: (width / 180).floor().clamp(2, 4),
+            childAspectRatio: (width / 2) / 270,
             crossAxisSpacing: 16,
             mainAxisSpacing: 2),
         delegate: body);
@@ -426,7 +433,7 @@ class _BuildAddButton extends StatelessWidget {
           padding: const EdgeInsets.all(5),
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-             colors: [Color(0xFFD1005B), Color(0xFFE8772F)],
+              colors: [Color(0xFFD1005B), Color(0xFFE8772F)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),

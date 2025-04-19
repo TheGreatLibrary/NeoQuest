@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:neoflex_quiz/widgets/base_scaffold.dart';
+import 'package:neoflex_quiz/widgets/constrained_box.dart';
 import 'package:neoflex_quiz/widgets/shimmer_widget.dart';
 import 'package:provider/provider.dart';
 
@@ -23,30 +24,32 @@ class QuizScreen extends StatelessWidget {
     return BaseScaffold(
       title: title,
       showLeading: true,
-      body: ChangeNotifierProvider(
-        create: (_) => QuizProvider(id, title),
-        child: Consumer<QuizProvider>(builder: (context, provider, child) {
-          return provider.isLoading
-              ? const _QuestionShimmer()
-              : provider.questions.isEmpty
-                  ? const Center(child: Text('Нет вопросов'))
-                  : PageView.builder(
-                      controller: provider.pageController,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemCount: provider.questions.length,
-                      itemBuilder: (context, index) {
-                        return _QuestionWidget(
-                          question: provider.questions[index],
-                          index: index,
-                          length: provider.questions.length - 1,
-                          onAnswerSelected: (isCorrect) =>
-                              provider.onAnswerSelected(isCorrect),
-                          onNext: () async =>
-                              await provider.nextQuestion(context),
-                        );
-                      },
-                    );
-        }),
+      body: CustomConstrainedBox(
+        child: ChangeNotifierProvider(
+          create: (_) => QuizProvider(id, title),
+          child: Consumer<QuizProvider>(builder: (context, provider, child) {
+            return provider.isLoading
+                ? const _QuestionShimmer()
+                : provider.questions.isEmpty
+                    ? const Center(child: Text('Нет вопросов'))
+                    : PageView.builder(
+                        controller: provider.pageController,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: provider.questions.length,
+                        itemBuilder: (context, index) {
+                          return _QuestionWidget(
+                            question: provider.questions[index],
+                            index: index,
+                            length: provider.questions.length - 1,
+                            onAnswerSelected: (isCorrect) =>
+                                provider.onAnswerSelected(isCorrect),
+                            onNext: () async =>
+                                await provider.nextQuestion(context),
+                          );
+                        },
+                      );
+          }),
+        ),
       ),
     );
   }
@@ -84,12 +87,14 @@ class _QuestionWidgetState extends State<_QuestionWidget> {
             constraints: BoxConstraints(minHeight: constraints.maxHeight),
             child: IntrinsicHeight(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 32),
                       decoration: ShapeDecoration(
                         gradient: const LinearGradient(
                           begin: Alignment(1.00, 0.00),
@@ -112,7 +117,8 @@ class _QuestionWidgetState extends State<_QuestionWidget> {
                             width: double.infinity,
                             decoration: ShapeDecoration(
                               shape: RoundedRectangleBorder(
-                                side: BorderSide(width: 0.6, color: Colors.white),
+                                side:
+                                    BorderSide(width: 0.6, color: Colors.white),
                               ),
                             ),
                           ),
@@ -125,36 +131,41 @@ class _QuestionWidgetState extends State<_QuestionWidget> {
                         ],
                       ),
                     ),
-
                     const SizedBox(height: 24),
-
                     ...List.generate(widget.question.answers.length, (index) {
                       final answer = widget.question.answers[index];
-                      final isCorrect = selectedIndex != null && answer == widget.question.correctAnswer;
-                      final isWrong = selectedIndex != null && index == selectedIndex && answer != widget.question.correctAnswer;
+                      final isCorrect = selectedIndex != null &&
+                          answer == widget.question.correctAnswer;
+                      final isWrong = selectedIndex != null &&
+                          index == selectedIndex &&
+                          answer != widget.question.correctAnswer;
 
                       return GestureDetector(
                         onTap: selectedIndex == null
                             ? () {
-                          setState(() {
-                            selectedIndex = index;
-                          });
-                          widget.onAnswerSelected(answer == widget.question.correctAnswer);
-                        }
+                                setState(() {
+                                  selectedIndex = index;
+                                });
+                                widget.onAnswerSelected(
+                                    answer == widget.question.correctAnswer);
+                              }
                             : null,
                         child: Container(
                           margin: const EdgeInsets.symmetric(vertical: 8),
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 16),
                           decoration: ShapeDecoration(
-                            color: isCorrect ? const Color(0xFFE1F9E5) : Colors.white,
+                            color: isCorrect
+                                ? const Color(0xFFE1F9E5)
+                                : Colors.white,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(15),
                               side: BorderSide(
                                 color: isCorrect
                                     ? const Color(0xFF0BA928)
                                     : isWrong
-                                    ? const Color(0xFFE8772F)
-                                    : Colors.black,
+                                        ? const Color(0xFFE8772F)
+                                        : Colors.black,
                                 width: 1,
                               ),
                             ),
@@ -165,19 +176,24 @@ class _QuestionWidgetState extends State<_QuestionWidget> {
                               Expanded(
                                 child: Text(
                                   answer,
-                                  style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                                    color: isCorrect
-                                        ? const Color(0xFF0BA928)
-                                        : isWrong
-                                        ? const Color(0xFFE8772F)
-                                        : Colors.black,
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineLarge
+                                      ?.copyWith(
+                                        color: isCorrect
+                                            ? const Color(0xFF0BA928)
+                                            : isWrong
+                                                ? const Color(0xFFE8772F)
+                                                : Colors.black,
+                                      ),
                                 ),
                               ),
                               if (isCorrect)
-                               SvgPicture.asset('assets/icons/check.svg', width: 20, height: 20)
+                                SvgPicture.asset('assets/icons/check.svg',
+                                    width: 20, height: 20)
                               else if (isWrong)
-                                SvgPicture.asset('assets/icons/x.svg', width: 20, height: 20)
+                                SvgPicture.asset('assets/icons/x.svg',
+                                    width: 20, height: 20)
                               else
                                 const SizedBox(width: 20),
                             ],
@@ -185,30 +201,32 @@ class _QuestionWidgetState extends State<_QuestionWidget> {
                         ),
                       );
                     }),
-
                     const Spacer(),
-
-                    if (selectedIndex != null) ElevatedButton(
-                          onPressed: widget.onNext,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFE8772F),
-                            overlayColor: const Color(0xFFFFFFFF).withOpacity(0.2),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(49)),
-                            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                          ),
-                          child:
-                              Text(
-                                widget.length == widget.index
-                                    ? "Завершить"
-                                    : "Дальше",
-                                style: Theme.of(context)
-                                    .textButtonTheme
-                                    .style
-                                    ?.textStyle
-                                    ?.resolve({}),
-                              ),
-                          )
-                    else SizedBox(height: 60),
+                    if (selectedIndex != null)
+                      ElevatedButton(
+                        onPressed: widget.onNext,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFE8772F),
+                          overlayColor:
+                              const Color(0xFFFFFFFF).withOpacity(0.2),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(49)),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 32, vertical: 16),
+                        ),
+                        child: Text(
+                          widget.length == widget.index
+                              ? "Завершить"
+                              : "Дальше",
+                          style: Theme.of(context)
+                              .textButtonTheme
+                              .style
+                              ?.textStyle
+                              ?.resolve({}),
+                        ),
+                      )
+                    else
+                      SizedBox(height: 60),
                   ],
                 ),
               ),

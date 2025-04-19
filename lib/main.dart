@@ -1,4 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart'; // Для проверки платформы
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'package:neoflex_quiz/main_page.dart';
 import 'package:neoflex_quiz/providers/onboarding_provider.dart';
@@ -10,6 +14,12 @@ import 'providers/providers.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  if (!kIsWeb && Platform.isWindows) {
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+  }
+
   bool isRegistered = await DatabaseHelper().isUserRegistered();
 
   runApp(

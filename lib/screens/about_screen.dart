@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:neoflex_quiz/widgets/base_scaffold.dart';
+import 'package:neoflex_quiz/widgets/constrained_box.dart';
 
 /// простой виджет со страницей, описывающей приложение и его разработчиков
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return BaseScaffold(
-      title: "О приложении",
-      showLeading: true,
-      body: SingleChildScrollView(
+        title: "О приложении",
+        showLeading: true,
+        body: SingleChildScrollView(
           padding: EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-          child: Column(
+          child: CustomConstrainedBox(
+              child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
@@ -43,7 +46,10 @@ class AboutScreen extends StatelessWidget {
                     ),
                     TextSpan(
                         text: '*&(!!!@#>><?',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w700)),
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.copyWith(fontWeight: FontWeight.w700)),
                     TextSpan(
                       text: ' — талантливый дизайнер.',
                       style: Theme.of(context).textTheme.bodySmall,
@@ -61,7 +67,10 @@ class AboutScreen extends StatelessWidget {
                     ),
                     TextSpan(
                         text: '%!#??*&!',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w700)),
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.copyWith(fontWeight: FontWeight.w700)),
                     TextSpan(
                       text: ' — фанатик программирования.',
                       style: Theme.of(context).textTheme.bodySmall,
@@ -70,13 +79,10 @@ class AboutScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              Text(
-                'Версия приложения: 1.0 beta',
-                style: Theme.of(context).textTheme.labelMedium
-              )
+              Text('Версия приложения: 1.0 beta',
+                  style: Theme.of(context).textTheme.labelMedium)
             ],
-          )
-      ),
-    );
+          )),
+        ));
   }
 }

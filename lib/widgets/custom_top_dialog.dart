@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:neoflex_quiz/widgets/constrained_box.dart';
 
 /// уведомление о получении достижения
 ///
@@ -114,27 +115,29 @@ class _CustomTopDialogState extends State<CustomTopDialog>
                   ) : null;
                   _controller.reverse().then((_) => _close());
                 },
-                child: Container(
-                  height: 68,
-                  decoration: ShapeDecoration(
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                child: CustomConstrainedBox(
+                  child: Container(
+                    height: 68,
+                    decoration: ShapeDecoration(
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      shadows: const [
+                        BoxShadow(
+                          color: Color(0x3F000000),
+                          blurRadius: 10,
+                          offset: Offset(0, 4),
+                          spreadRadius: 0,
+                        )
+                      ],
                     ),
-                    shadows: const [
-                      BoxShadow(
-                        color: Color(0x3F000000),
-                        blurRadius: 10,
-                        offset: Offset(0, 4),
-                        spreadRadius: 0,
-                      )
-                    ],
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    widget.text,
-                    style: Theme.of(context).textTheme.bodyMedium,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      widget.text,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
                   ),
                 ),
               ),

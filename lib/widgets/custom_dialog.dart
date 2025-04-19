@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:neoflex_quiz/widgets/constrained_box.dart';
 import 'dart:ui';
 
 import 'gradient_border_button.dart';
@@ -39,13 +40,15 @@ class CustomDialog extends StatelessWidget {
               color: Colors.white.withOpacity(0.1),
             ),
           ),
-          DialogContent(
-            gradient: gradient,
-            title: title,
-            description: description,
-            icon: icon,
-            buttonText: buttonText,
-            buttonPress: buttonPress,
+          CustomConstrainedBox(
+            child: DialogContent(
+              gradient: gradient,
+              title: title,
+              description: description,
+              icon: icon,
+              buttonText: buttonText,
+              buttonPress: buttonPress,
+            ),
           ),
         ],
       ),
@@ -98,8 +101,7 @@ class DialogContent extends StatelessWidget {
                     shaderCallback: (Rect bounds) {
                       return gradient.createShader(bounds);
                     },
-                    child: SvgPicture.asset(
-                        icon!, width: 32, height: 32),
+                    child: SvgPicture.asset(icon!, width: 32, height: 32),
                   ),
                 ShaderMask(
                   shaderCallback: (Rect bounds) {
@@ -115,25 +117,25 @@ class DialogContent extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             if (description != null)
-             Text(
+              Text(
                 description!,
                 style: Theme.of(context).textTheme.bodySmall,
                 textAlign: TextAlign.center,
               ),
             const SizedBox(height: 20),
-              GradientButton(
-                onPressed: buttonPress.first,
-                buttonText: buttonText.first,
+            GradientButton(
+              onPressed: buttonPress.first,
+              buttonText: buttonText.first,
+              gradient: gradient,
+            ),
+            if (buttonPress.length == 2 && buttonText.length == 2) ...[
+              const SizedBox(height: 16),
+              GradientBorderButton(
+                onPressed: buttonPress.last,
+                buttonText: buttonText.last,
                 gradient: gradient,
               ),
-              if (buttonPress.length == 2 && buttonText.length == 2) ...[
-                const SizedBox(height: 16),
-                GradientBorderButton(
-                  onPressed: buttonPress.last,
-                  buttonText: buttonText.last,
-                  gradient: gradient,
-                ),
-              ]
+            ]
           ],
         ),
       ),
