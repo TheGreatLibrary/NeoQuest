@@ -12,6 +12,7 @@ import '../widgets/delay_loading_image.dart';
 import '../widgets/gradient_text.dart';
 import 'product_screen.dart';
 
+/// страница магазина
 class MarketScreen extends StatefulWidget {
   const MarketScreen({super.key});
 
@@ -22,6 +23,10 @@ class MarketScreen extends StatefulWidget {
 class _MarketScreenState extends State<MarketScreen> {
   bool _isPrecached = false;
 
+  /// инициализация данных
+  ///
+  /// 1. прогрузка товаров магазина
+  /// 2. прекэширование фотографий карточек товаров в магазине
   @override
   void initState() {
     super.initState();
@@ -65,6 +70,7 @@ class _MarketScreenState extends State<MarketScreen> {
                     final provider = context.watch<ProductProvider>();
                     final cards = provider.products;
 
+                    /// пока данные грузятся - заглушка
                     if (provider.isLoading || !_isPrecached) {
                       return SliverGridMarket(
                         body: SliverChildBuilderDelegate(
@@ -74,6 +80,7 @@ class _MarketScreenState extends State<MarketScreen> {
                       );
                     }
 
+                    /// если товаров нет (в результате поиска например), итог
                     if (cards.isEmpty) {
                       return const SliverToBoxAdapter(
                         child: SizedBox(
@@ -85,6 +92,7 @@ class _MarketScreenState extends State<MarketScreen> {
                       );
                     }
 
+                    /// товары
                     return SliverGridMarket(
                       body: SliverChildBuilderDelegate(
                         (context, index) {
@@ -103,6 +111,7 @@ class _MarketScreenState extends State<MarketScreen> {
   }
 }
 
+/// шапка магазина
 class _Header extends StatelessWidget {
   const _Header();
 
@@ -120,6 +129,7 @@ class _Header extends StatelessWidget {
   }
 }
 
+/// кнопки корзины и заказов
 class _HeaderWithButtons extends StatelessWidget {
   const _HeaderWithButtons();
 
@@ -169,6 +179,7 @@ class _HeaderWithButtons extends StatelessWidget {
   }
 }
 
+/// кнопка в шапке
 class _HeaderButton extends StatelessWidget {
   final String icon;
   final VoidCallback onPressed;
@@ -189,6 +200,7 @@ class _HeaderButton extends StatelessWidget {
   }
 }
 
+/// поисковая строка в шапке магазина
 class _SearchTextField extends StatelessWidget {
   const _SearchTextField();
 
@@ -268,6 +280,7 @@ class _SearchTextField extends StatelessWidget {
   }
 }
 
+/// список товаров
 class SliverGridMarket extends StatelessWidget {
   final SliverChildBuilderDelegate body;
 
@@ -286,6 +299,7 @@ class SliverGridMarket extends StatelessWidget {
   }
 }
 
+/// заглушка товара
 class _ShimmerProductCard extends StatelessWidget {
   const _ShimmerProductCard();
 
@@ -304,6 +318,7 @@ class _ShimmerProductCard extends StatelessWidget {
   }
 }
 
+/// карточка товара
 class _ProductCard extends StatelessWidget {
   final Product product;
 
@@ -353,6 +368,7 @@ class _ProductCard extends StatelessWidget {
   }
 }
 
+/// картинка товара
 class _ProductImage extends StatelessWidget {
   final String image;
 
@@ -382,6 +398,7 @@ class _ProductImage extends StatelessWidget {
   }
 }
 
+/// кнопка добавления товара в корзину
 class _BuildAddButton extends StatelessWidget {
   final Product product;
 
@@ -389,32 +406,37 @@ class _BuildAddButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    /// чтение данных провайдера корзины
     final provider = context.read<CartProvider>();
 
-    return ElevatedButton(
-      onPressed: () => provider.addProductToCart(product.id, 1, context),
-      style: ButtonStyle(
-        padding: WidgetStateProperty.all(EdgeInsets.zero),
-        shape: WidgetStateProperty.all(CircleBorder()),
-        elevation: WidgetStateProperty.all(0),
-      ),
-      child: Container(
-        padding: const EdgeInsets.all(5),
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color.fromRGBO(209, 0, 97, 0.75),
-              Color.fromRGBO(232, 119, 47, 0.75),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          shape: BoxShape.circle,
+    return Opacity(
+      opacity: 0.75, // от 0.0 (полностью прозрачный) до 1.0 (полностью видимый)
+      child: ElevatedButton(
+        onPressed: () => provider.addProductToCart(product.id, 1, context),
+        style: ButtonStyle(
+          padding: WidgetStateProperty.all(EdgeInsets.zero),
+          shape: WidgetStateProperty.all(CircleBorder()),
+          elevation: WidgetStateProperty.all(0),
+          backgroundColor: WidgetStateProperty.all(Colors.transparent),
+          // важно!
+          shadowColor: WidgetStateProperty.all(
+              Colors.transparent), // чтобы не было теней
         ),
-        child: SvgPicture.asset(
-          'assets/icons/ic_cart_plus.svg',
-          width: 32,
-          height: 32,
+        child: Container(
+          padding: const EdgeInsets.all(5),
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+             colors: [Color(0xFFD1005B), Color(0xFFE8772F)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            shape: BoxShape.circle,
+          ),
+          child: SvgPicture.asset(
+            'assets/icons/ic_cart_plus.svg',
+            width: 32,
+            height: 32,
+          ),
         ),
       ),
     );

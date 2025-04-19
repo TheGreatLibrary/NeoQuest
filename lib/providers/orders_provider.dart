@@ -22,15 +22,20 @@ class OrdersProvider with ChangeNotifier, WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
   }
 
+  /// прогрузка списка заказов
   Future<void> loadOrders() async {
+    _isLoading = true;
     _orders = await _dbHelper.getOrders();
+    _isLoading = false;
     notifyListeners();
   }
 
+  /// получение списка товаров в заказе
   Future<List<OrderItemWithProduct>> loadItemByOrder(int id) async {
     return _dbHelper.getOrderItemsWithProduct(id);
   }
 
+  /// обновление данных по списку заказов
   Future<void> checkAndUpdateOrders() async {
     _isLoading = true;
     await _dbHelper.updateOrdersStatus();
@@ -40,7 +45,7 @@ class OrdersProvider with ChangeNotifier, WidgetsBindingObserver {
     notifyListeners();
   }
 
-
+  /// запуск таймера с периодом в 1 минуту и обновлением данных по заказам
   void _startAutoUpdate() {
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(minutes: 1), (_) async {
@@ -55,14 +60,17 @@ class OrdersProvider with ChangeNotifier, WidgetsBindingObserver {
         _isUpdating = false;
       }
     });
-    print("Таймер ЗАПУЩЕН!");
   }
 
+  /// отключение таймера
   void _stopAutoUpdate() {
     _timer?.cancel();
     _timer = null;
   }
 
+  /// при выходе из приложения в фон
+  /// таймер отключаеся, а при заходе
+  /// включается, чтобы не тратить ресурсы в фоне
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
@@ -72,6 +80,7 @@ class OrdersProvider with ChangeNotifier, WidgetsBindingObserver {
     }
   }
 
+  /// остановка таймера
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
@@ -79,6 +88,7 @@ class OrdersProvider with ChangeNotifier, WidgetsBindingObserver {
     super.dispose();
   }
 
+  /// создание заказа
   Future<int> createOrder(String date, String delivery, String cancellation, int price) async {
     int result = await _dbHelper.createOrder(date, delivery, cancellation, price);
     loadOrders();

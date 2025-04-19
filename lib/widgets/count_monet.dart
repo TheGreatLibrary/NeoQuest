@@ -3,6 +3,7 @@ import "package:provider/provider.dart";
 
 import "../providers/coin_provider.dart";
 
+/// количество монет у пользователя в шапке приложения
 class CountMonet extends StatelessWidget {
   const CountMonet({super.key});
 

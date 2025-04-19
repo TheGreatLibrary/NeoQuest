@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
+/// кастомный чекбокс для onboarding
 class CustomCheckBox extends StatelessWidget {
   final bool value;
   final bool isError;

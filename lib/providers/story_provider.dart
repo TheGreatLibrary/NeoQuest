@@ -12,6 +12,7 @@ import 'account_provider.dart';
 import 'achievement_provider.dart';
 import 'coin_provider.dart';
 
+/// провайдер для работы с историями
 class StoryProvider with ChangeNotifier {
   final _dbHelper = DatabaseHelper();
   final PageController pageController = PageController();
@@ -28,20 +29,18 @@ class StoryProvider with ChangeNotifier {
   List<Story> get stories => _stories;
 
   StoryProvider(this.quizId, this.title) {
-    loadQuestions();
+    loadStory();
   }
 
-  Future<void> loadQuestions() async {
+  /// загрузка истории
+  Future<void> loadStory() async {
     _isLoading = true;
     _stories = await _dbHelper.getStoryDialogs(quizId);
     _isLoading = false;
     notifyListeners();
   }
 
-  void onAnswerSelected() {
-    notifyListeners();
-  }
-
+  /// переход к следующей странице с репликой
   Future<void> nextDialog(BuildContext context) async {
     if (_currentSlide < _stories.length - 1) {
       _currentSlide++;
@@ -53,6 +52,7 @@ class StoryProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  /// результат
   Future<void> _showResultsDialog(BuildContext context) async {
     await rewardPlayer(context);
     showDialog(
@@ -82,6 +82,7 @@ class StoryProvider with ChangeNotifier {
     }
   }
 
+  /// обновление статуса, денег
   Future<void> rewardPlayer(BuildContext context) async {
     _monet = await _dbHelper.rewardPlayer(quizId: quizId);
 
@@ -99,6 +100,7 @@ class StoryProvider with ChangeNotifier {
 
   }
 
+  /// обновление статуса для следующей карточки
   Future<void> _updateNextCardState(int quizId, BuildContext context) async {
     int? nextState = await _dbHelper.getCardState(quizId + 1);
     if (nextState != null && nextState == 0) {

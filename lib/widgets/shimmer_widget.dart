@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
+
+/// базовый шиммер с 2 вариантами форм: круг и квадрат
 class ShimmerWidget extends StatelessWidget {
   final double? width;
   final double? height;

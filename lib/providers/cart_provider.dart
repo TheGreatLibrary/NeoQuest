@@ -3,6 +3,7 @@ import 'package:neoflex_quiz/database/models/cart_item.dart';
 
 import '../database/data_based_helper.dart';
 
+/// логический центр для работы с корзиной
 class CartProvider with ChangeNotifier {
   final _dbHelper = DatabaseHelper();
   List<CartItem> _cartItems = [];
@@ -20,6 +21,7 @@ class CartProvider with ChangeNotifier {
     checkCart();
   }
 
+  /// проверка корзины на наличие товаров
   Future<void> checkCart() async {
     final isEmpty = await _dbHelper.isCartEmpty();
     if (_cartEmpty != isEmpty) {
@@ -28,6 +30,7 @@ class CartProvider with ChangeNotifier {
     }
   }
 
+  /// загрузка корзины товарами с подсчетом суммы по товарам
   Future<void> loadCart() async {
     _isLoading = true;
     _cartItems = await _dbHelper.getCartItems();
@@ -36,6 +39,7 @@ class CartProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  /// добавление товара в корзину (убавление)
   Future<void> addToCart(CartItem item, int quantity) async {
     if (item.quantity + quantity > 0) {
       await _dbHelper.addToCart(item.productId, quantity);
@@ -43,6 +47,7 @@ class CartProvider with ChangeNotifier {
     }
   }
 
+  /// добавление товара в корзину через магазин
   Future<void> addProductToCart(int productId, int quantity, BuildContext context) async {
       int result = await _dbHelper.addToCart(productId, quantity);
       if (result == -1) {
@@ -60,10 +65,11 @@ class CartProvider with ChangeNotifier {
           ),
         );
       }
-        await loadCart();
-        checkCart();
+      await loadCart();
+      checkCart();
   }
 
+  /// удаление товара с корзины
   Future<void> removeItem(CartItem item) async {
     await _dbHelper.removeFromCart(item.id);
     _cartItems.remove(item);
@@ -72,6 +78,7 @@ class CartProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  /// проверка нехватки монет для оформления заказа
   Future<bool> checkMonet() async {
     int monet = await _dbHelper.getMoney();
     return _totalPrice + 10 > monet;

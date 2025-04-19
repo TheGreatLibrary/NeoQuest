@@ -9,16 +9,23 @@ import 'screens/account_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/market_screen.dart';
 
+/// управляет 3 основными страницами и кэширует страницы
+/// для следующих переходов
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
 
   @override
   State<MainPage> createState() => _MainPageState();
 }
-
 class _MainPageState extends State<MainPage> {
+  /// список с экранами
   late final List<Widget> _screens;
 
+  /// инициализация данных
+  ///
+  /// 1. заполнение списка пустышками вместо страниц
+  /// 2. прекэширование иконки монет, так как используется везде
+  /// 3. явная инициализация OrderProvider для начала работы таймера
   @override
   void initState() {
     super.initState();
@@ -28,10 +35,12 @@ class _MainPageState extends State<MainPage> {
       await precacheImage(
           const AssetImage('assets/image/ic_monet.png'), context);
 
-      context.read<OrdersProvider>(); // начало работы таймера
+      context.read<OrdersProvider>();
     });
   }
 
+  /// Метод для получения виджета экрана по индексу
+  /// При каких-то исключениях в некорректном индексе возвращается загрушка
   Widget _buildScreen(int index) {
     switch (index) {
       case 0:
@@ -54,11 +63,15 @@ class _MainPageState extends State<MainPage> {
     }
   }
 
+  /// постройка виджета
   @override
   Widget build(BuildContext context) {
+    /// переменная для отслеживания работы клавиатуры. Она обеспечивает сокрытие
+    /// навигационной панели при появлении клавиатуры, чтобы навигация не портилась
     final isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
-    final selectedIndex = context.watch<SelectedIndexPage>().selectedIndex;
 
+    /// выбранная страница берется из Provider
+    final selectedIndex = context.watch<SelectedIndexPage>().selectedIndex;
     _screens[selectedIndex] = _buildScreen(selectedIndex);
 
     return BaseScaffold(
@@ -78,6 +91,7 @@ class _MainPageState extends State<MainPage> {
   }
 }
 
+/// класс, отвечающий за переключение страницы с плавной анимацией за 300мс
 class _AnimatedScreenSwitcher extends StatelessWidget {
   final int currentIndex;
   final List<Widget> children;
@@ -87,6 +101,8 @@ class _AnimatedScreenSwitcher extends StatelessWidget {
     required this.children,
   });
 
+  /// обеспечивает анимацию переключеня между страницами с плавным
+  /// эффектом проявления за 300мс
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -105,9 +121,9 @@ class _AnimatedScreenSwitcher extends StatelessWidget {
   }
 }
 
+/// класс навигационной панели
 class _CustomBottomNavBar extends StatelessWidget {
   const _CustomBottomNavBar();
-
   @override
   Widget build(BuildContext context) {
     return Positioned(
@@ -156,6 +172,8 @@ class _CustomBottomNavBar extends StatelessWidget {
   }
 }
 
+/// виджет для создания одного элемента навигационной панели с анимацией
+/// переключения и окраски
 class _NavItem extends StatelessWidget {
   final String iconPath;
   final bool isSelected;
@@ -198,6 +216,9 @@ class _NavItem extends StatelessWidget {
   }
 }
 
+/// отвечает за сохрание страницы, чтобы устранить лишние отрисовки
+///
+/// 3 основных страницы постоянно используются, так что их требуется кэшировать
 class _KeepAliveWrapper extends StatefulWidget {
   final Widget child;
 
@@ -209,7 +230,6 @@ class _KeepAliveWrapper extends StatefulWidget {
   @override
   State<_KeepAliveWrapper> createState() => _KeepAliveWrapperState();
 }
-
 class _KeepAliveWrapperState extends State<_KeepAliveWrapper>
     with AutomaticKeepAliveClientMixin {
   @override

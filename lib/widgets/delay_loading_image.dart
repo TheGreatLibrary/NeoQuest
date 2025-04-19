@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// картинка с заданной задержкой плавного проявления для красивого эффекта
 class DelayLoadingImage extends StatefulWidget {
   final String imagePath;
   final double? width;

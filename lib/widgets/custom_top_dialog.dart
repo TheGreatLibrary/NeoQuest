@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+/// уведомление о получении достижения
+///
+/// показывается поверх всего с возможность свапнуть в бок и перейти по нажатию
 class CustomTopDialog extends StatefulWidget {
   final String text;
   final OverlayEntry entry;
@@ -32,6 +35,8 @@ class _CustomTopDialogState extends State<CustomTopDialog>
 
   bool _isClosed = false;
 
+
+  /// инициализация данных по анимации
   @override
   void initState() {
     super.initState();

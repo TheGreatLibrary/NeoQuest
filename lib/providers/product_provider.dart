@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../database/data_based_helper.dart';
 import '../database/models/product.dart';
 
+/// провайдер для работы с логикой в магазине
 class ProductProvider with ChangeNotifier {
   final _dbHelper = DatabaseHelper();
   Timer? _debounce;
@@ -19,7 +20,8 @@ class ProductProvider with ChangeNotifier {
   List<Product> get products => _filteredProducts;
   bool get isLoading => _isLoading;
 
-
+  /// фильтрация списка товаров в магазине с задержкой в 500мс
+  /// чтобы не дергать каждое нажатие на кавиатуру список товаров
   void filterProducts(String query) {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
 
@@ -35,6 +37,7 @@ class ProductProvider with ChangeNotifier {
     });
   }
 
+  /// первая подгрузка товаров в магазине
   Future<void> loadProducts() async {
     _isLoading = true;
     notifyListeners();
@@ -46,10 +49,12 @@ class ProductProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  /// получение данных по id товара
   Future<Product?> getProductById(int productId) async {
     return await _dbHelper.getProductById(productId);
   }
 
+  /// метод для кнопки крестика в поле поиска
   void clearSearch() {
     searchController.clear();
     unfocusSearch();
@@ -57,6 +62,7 @@ class ProductProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  /// снятие фокусировки
   void unfocusSearch() {
     if (focusNode.hasFocus) focusNode.unfocus();
   }

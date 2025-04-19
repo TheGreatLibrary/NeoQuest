@@ -1,12 +1,17 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:neoflex_quiz/widgets/gradient_button.dart';
+import 'package:neoflex_quiz/widgets/shimmer_widget.dart';
 import 'package:provider/provider.dart';
 import '../database/models/story.dart';
 import '../providers/story_provider.dart';
 import '../widgets/base_scaffold.dart';
 import '../widgets/delay_loading_image.dart';
 
+/// страница с историей
+///
+/// в зависимости от самой истории выставляется фоновый цвет и картинка (костыльно)
+/// с помощью consumer выбираются данные из провайдера для определенной истории
 class StoryScreen extends StatelessWidget {
   final int id;
   final String title;
@@ -61,9 +66,11 @@ class StoryScreen extends StatelessWidget {
                       child: Consumer<StoryProvider>(
                           builder: (context, provider, child) {
                         return provider.isLoading
-                            ? Center(child: CircularProgressIndicator())
+                            ? const _ShimmerStoryPage()
+                              //const Center(child: CircularProgressIndicator())
                             : provider.stories.isEmpty
-                                ? SizedBox()
+                                ? const _PlaceHolderStoryPage()
+                                //const SizedBox()
                                 : PageView.builder(
                                     controller: provider.pageController,
                                     physics: NeverScrollableScrollPhysics(),
@@ -85,6 +92,95 @@ class StoryScreen extends StatelessWidget {
   }
 }
 
+/// шиммер заглушка при загрузке
+class _ShimmerStoryPage extends StatelessWidget {
+  const _ShimmerStoryPage();
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+          children: [
+            Positioned.fill(
+              child: Container(color: Colors.transparent),
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                  padding: const EdgeInsets.only(left: 16, right: 16),
+                  child: ShimmerWidget.rectangular(height: MediaQuery.of(context).size.height / 2.2),
+              )
+            ),
+          ],
+        );
+  }
+}
+
+/// заглушка, если вопросы не загружаются или их нет
+class _PlaceHolderStoryPage extends StatelessWidget {
+  const _PlaceHolderStoryPage();
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+          children: [
+            Positioned.fill(
+              child: Container(color: Colors.transparent),
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                  padding: const EdgeInsets.only(left: 16, right: 16),
+                  child: Container(
+                      height: MediaQuery.of(context).size.height / 2.2,
+                      padding: const EdgeInsets.only(
+                          left: 24, right: 24, top: 16, bottom: 24),
+                      decoration: ShapeDecoration(
+                        color: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Нео ',
+                                  style:
+                                  Theme.of(context).textTheme.titleSmall),
+                              Container(
+                                margin: EdgeInsets.symmetric(vertical: 16),
+                                width: double.infinity,
+                                decoration: const ShapeDecoration(
+                                  shape: RoundedRectangleBorder(
+                                    side: BorderSide(
+                                      width: 1,
+                                      strokeAlign: BorderSide.strokeAlignCenter,
+                                      color: Color(0xFFD1005B),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 16),
+                                child: Text("У меня нет слов")
+                              ),
+                            ],
+                          ),
+                        ],
+                      ))),
+            ),
+          ],
+        );
+  }
+}
+
+/// виджет, где выводится текст робота Нео
+///
+/// Для того, чтобы текст был показан полностью - нужно ткнуть на сам текст
 class _StoryPage extends StatelessWidget {
   final Story story;
   final VoidCallback onNext;
@@ -174,6 +270,10 @@ class _StoryPage extends StatelessWidget {
   }
 }
 
+/// анимационный робот
+///
+/// засчет небольших поворотов и сдвигов в разные стороны создается ощущение
+/// живости.
 class _FloatingRobot extends StatefulWidget {
   const _FloatingRobot();
 
@@ -191,6 +291,7 @@ class _FloatingRobotState extends State<_FloatingRobot> with TickerProviderState
   late final AnimationController _tiltController;
   late final Animation<double> _tiltAnimation;
 
+  /// инициализация данных контроллеров
   @override
   void initState() {
     super.initState();
@@ -199,6 +300,7 @@ class _FloatingRobotState extends State<_FloatingRobot> with TickerProviderState
       duration: Duration(seconds: 2, milliseconds: 100),
       vsync: this,
     )..repeat(reverse: true);
+
 
     _floatAnimation = Tween<double>(begin: -2, end: 6).animate(
       CurvedAnimation(parent: _floatController, curve: Curves.easeInOut),

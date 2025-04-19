@@ -13,6 +13,7 @@ import 'account_provider.dart';
 import 'achievement_provider.dart';
 import 'coin_provider.dart';
 
+/// управление логикой работы квиза с вопросами
 class QuizProvider with ChangeNotifier {
   final _dbHelper = DatabaseHelper();
   final int quizId;
@@ -34,6 +35,7 @@ class QuizProvider with ChangeNotifier {
     loadQuestions();
   }
 
+  /// загрузка вопросов
   Future<void> loadQuestions() async {
     _isLoading = true;
     _questions = await _dbHelper.getQuestions(quizId);
@@ -41,6 +43,8 @@ class QuizProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  /// простейший метод для обновления данных по провайдеру,
+  /// чтобы обновить страницу
   void onAnswerSelected(bool isCorrect) {
     if (isCorrect) {
       _correctAnswersCount++;
@@ -48,6 +52,7 @@ class QuizProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  /// переход на следующую страницу с вопросом
   Future<void> nextQuestion(BuildContext context) async {
     if (_currentQuestion < _questions.length - 1) {
       _currentQuestion++;
@@ -59,6 +64,7 @@ class QuizProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  /// результат
   Future<void> _showResultsDialog(BuildContext context) async {
     await rewardPlayer(context);
     showDialog(
@@ -111,6 +117,7 @@ class QuizProvider with ChangeNotifier {
     );
   }
 
+  /// обновление данных
   Future<void> rewardPlayer(BuildContext context) async {
     _monet = await _dbHelper.rewardPlayer(quizId: quizId, correctAnswers: _correctAnswersCount);
     notifyListeners();
@@ -136,6 +143,7 @@ class QuizProvider with ChangeNotifier {
     }
   }
 
+  /// обновление данных для квиза
   Future<void> _updateNextCardState(int quizId, BuildContext context) async {
     int? nextState = await _dbHelper.getCardState(quizId + 1);
     if (nextState != null && nextState == 0) {

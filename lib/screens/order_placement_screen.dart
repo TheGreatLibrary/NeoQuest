@@ -10,6 +10,7 @@ import '../providers/providers.dart';
 import '../widgets/custom_dialog.dart';
 import '../widgets/custom_text_field.dart';
 
+/// страница для оформления заказа
 class OrderPlacementScreen extends StatefulWidget {
   final List<CartItem> cartItems;
   final int totalPrice;
@@ -51,6 +52,7 @@ class _OrderPlacementScreenState extends State<OrderPlacementScreen> {
     super.dispose();
   }
 
+  /// загрузка данных в поля из аккаунта, если они есть
   void loadTextField() async {
     final account = await context.read<AccountProvider>().getAccount();
 
@@ -65,6 +67,7 @@ class _OrderPlacementScreenState extends State<OrderPlacementScreen> {
     }
   }
 
+  /// отдельный метод для валидации ФИО, так как надо проверить, что там не только имя
   bool validateFullName() {
     final parts = _fullNameController.text.split(RegExp(r'\s+'));
     final nameRegex = RegExp(r'^[a-zA-Zа-яА-ЯёЁ]+$');
@@ -73,11 +76,16 @@ class _OrderPlacementScreenState extends State<OrderPlacementScreen> {
         parts.every((part) => part.isNotEmpty && nameRegex.hasMatch(part));
   }
 
+  /// валидация полей при нажатии на кнопку.
+  ///
+  /// Если все окей, оформляется заказ
   void _validateAndSubmit() {
+    /// поля обрезаются для избегания пробелов
     _fullNameController.text = _fullNameController.text.trim();
     _phoneController.text = _phoneController.text.trim();
     _postController.text = _postController.text.trim();
 
+    /// если есть ошибки при валидации они отображаются под полями
     setState(() {
       _isFullNameError = !validateFullName();
       _isPhoneError =
@@ -85,6 +93,7 @@ class _OrderPlacementScreenState extends State<OrderPlacementScreen> {
       _isPostError = !RegExp(r'^\d{6}$').hasMatch(_postController.text);
     });
 
+    /// фокусировка на поле с ошибкой
     if (_isFullNameError) {
       _fullNameFocus.requestFocus();
     } else if (_isPhoneError) {
@@ -92,6 +101,7 @@ class _OrderPlacementScreenState extends State<OrderPlacementScreen> {
     } else if (_isPostError) {
       _postFocus.requestFocus();
     } else if (!_isFullNameError && !_isPhoneError && !_isPostError) {
+      /// когда ошибок нет предлагается вариант отказаться от оформления заказа
       showDialog(
         context: context,
         builder: (_) => CustomDialog(
@@ -107,6 +117,8 @@ class _OrderPlacementScreenState extends State<OrderPlacementScreen> {
             buttonPress: [
               () async {
                 Navigator.pop(context);
+
+                /// обновляются данные аккаунта
                 int success = await context
                     .read<AccountProvider>()
                     .updateAccountFields(
@@ -114,13 +126,16 @@ class _OrderPlacementScreenState extends State<OrderPlacementScreen> {
                         phone: _phoneController.text,
                         postalCode: _postController.text);
                 if (success != -1) {
+                  /// создание заказа
                   context.read<OrdersProvider>().createOrder(
                       getCurrentDateTime(),
                       getDateTime(1),
                       getDateTime(2),
                       widget.totalPrice + 10);
+                  /// обновление состояния аккаунта пользователя
                   context.read<CoinProvider>().updateCoins();
                   final cart = context.read<CartProvider>();
+                  /// очистка корзины и обновление ее
                   cart.checkCart();
                   cart.loadCart();
 
@@ -154,10 +169,12 @@ class _OrderPlacementScreenState extends State<OrderPlacementScreen> {
     }
   }
 
+  /// метод для получения текущей даты
   String getCurrentDateTime() {
     return DateFormat('dd.MM.yyyy HH:mm:ss').format(DateTime.now()); // Например, 25.03.2025 14:30:00
   }
 
+  /// метод для получения даты с каким-то добавочным числом
   String getDateTime(int minutes) {
     return DateFormat('dd.MM.yyyy HH:mm:ss')
         .format(DateTime.now().add(Duration(minutes: minutes)));
@@ -165,6 +182,7 @@ class _OrderPlacementScreenState extends State<OrderPlacementScreen> {
 
   @override
   Widget build(BuildContext context) {
+    /// переменная для проверки появления клавиатуры и скрытия кнопки
     final isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
 
     return BaseScaffold(

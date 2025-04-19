@@ -15,13 +15,17 @@ import '../widgets/custom_text_field.dart';
 import '../widgets/custom_top_dialog.dart';
 import '../widgets/delay_loading_image.dart';
 
+
+/// онбординг приложения
 class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    /// подписка на изменения провайдера
     final provider = context.watch<OnboardingProvider>();
 
+    /// список страниц
     final pages = [
       const _OnboardingPage(
         title: "Добро пожаловать в путеводитель по миру компании Neoflex!",
@@ -58,6 +62,7 @@ class OnboardingScreen extends StatelessWidget {
   }
 }
 
+/// индикатор прогресса
 class _ProgressIndicatorWidget extends StatelessWidget {
   const _ProgressIndicatorWidget();
 
@@ -115,6 +120,7 @@ class _ProgressIndicatorWidget extends StatelessWidget {
   }
 }
 
+/// градиентная кнопка для продолжения дальше
 class _GradientNextButton extends StatelessWidget {
   const _GradientNextButton();
 
@@ -133,6 +139,7 @@ class _GradientNextButton extends StatelessWidget {
   }
 }
 
+/// страница без формы
 class _OnboardingPage extends StatelessWidget {
   final String title;
   final String subtitle;
@@ -178,6 +185,7 @@ class _OnboardingPage extends StatelessWidget {
   }
 }
 
+/// страница с формой регистрации
 class _RegistrationPage extends StatelessWidget {
   const _RegistrationPage();
 
@@ -205,6 +213,7 @@ class _RegistrationPage extends StatelessWidget {
   }
 }
 
+/// регистрационная шапка
 class _RegistrationHeader extends StatelessWidget {
   const _RegistrationHeader();
 
@@ -226,6 +235,7 @@ class _RegistrationHeader extends StatelessWidget {
   }
 }
 
+/// форма регистрации
 class _RegistrationForm extends StatefulWidget {
   const _RegistrationForm();
 
@@ -253,21 +263,26 @@ class _RegistrationFormState extends State<_RegistrationForm> {
     super.dispose();
   }
 
+  /// валидация полей регистрации по нажатии на кнопку
   void _validateAndSubmit() async {
+    /// обрезание пробелов
     final name = _usernameController.text.trim();
     final ageText = _ageController.text.trim();
     final age = int.tryParse(ageText);
 
+    /// валидация
     final isNameValid = name.isNotEmpty && name.length >= 2;
     final isAgeValid = age != null && age >= 6 && age <= 140;
     final isCheckboxValid = _isChecked;
 
+    /// установка ошибок, если есть
     setState(() {
       _isUsernameError = !isNameValid;
       _isAgeError = !isAgeValid;
       _isCheckBoxError = !isCheckboxValid;
     });
 
+    /// фокусирование на поле с ошибкой
     if (!isNameValid) {
       _usernameFocus.requestFocus();
       return;
@@ -281,10 +296,15 @@ class _RegistrationFormState extends State<_RegistrationForm> {
     }
   }
 
+  /// метод для регистрации аккаунта
+  ///
+  /// 1. подписывается на провайдеры аккаунта и достижений
+  /// 2. создает аккаунт
+  /// 3. меняем 2 фразы в 1 истории под имя пользователя
+  /// 4. переход на MainPage
   Future<void> _registerAccount(String name, int age) async {
     final accountProvider = context.read<AccountProvider>();
     final achievementProvider = context.read<AchievementProvider>();
-
 
     final success = await accountProvider.createAccount(name, age);
     await accountProvider.replaceStoryDialogs(name);

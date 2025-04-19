@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// текстовое поле с контроллером, фокусом и сообщением об ошибке
 class CustomTextField extends StatefulWidget {
   final TextEditingController controller;
   final String label;

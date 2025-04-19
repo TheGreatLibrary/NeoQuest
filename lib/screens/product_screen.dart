@@ -8,6 +8,7 @@ import '../widgets/base_scaffold.dart';
 import '../widgets/delay_loading_image.dart';
 import '../widgets/gradient_button.dart';
 
+/// страница товара с магазина
 class ProductScreen extends StatelessWidget {
   final Product product;
 
@@ -15,6 +16,7 @@ class ProductScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    /// получается информация с провайдера корзины для обновления состояния кнопки удаления товара из корзины
     final cartProvider = Provider.of<CartProvider>(context);
     final isInCart = cartProvider.cartItems.any((cartItem) => cartItem.productId == product.id);
 

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:neoflex_quiz/widgets/base_scaffold.dart';
 
+/// простой виджет со страницей, описывающей приложение и его разработчиков
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
-
   @override
   Widget build(BuildContext context) {
     return BaseScaffold(

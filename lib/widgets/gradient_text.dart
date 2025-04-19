@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// градиентный текст
 class GradientText extends StatelessWidget {
   final String text;
   final List<Color> gradient;

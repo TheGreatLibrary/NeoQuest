@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'gradient_border_button.dart';
 import 'gradient_button.dart';
 
+/// диалоговое окно с полями для настройки под любой дизайн
 class CustomDialog extends StatelessWidget {
   final LinearGradient gradient;
   final String title;

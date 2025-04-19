@@ -11,9 +11,11 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import '../widgets/shimmer_widget.dart';
 import 'about_screen.dart';
 
+/// виджет для страницы аккаунта
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
 
+  /// построение виджета из вспомогательных виджетов
   @override
   Widget build(BuildContext context) {
     return const SafeArea(
@@ -37,9 +39,11 @@ class AccountScreen extends StatelessWidget {
   }
 }
 
+/// виджет с иконкой, именем и возрастом
 class _AccountProfile extends StatelessWidget {
   const _AccountProfile();
 
+  /// метод для склонения суффикса к возрасту в профиле
   String _ageWithSuffix(int age) {
     int lastDigit = age % 10;
     int lastTwoDigits = age % 100;
@@ -62,15 +66,18 @@ class _AccountProfile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    /// загрузка данных с провайдера
     return FutureBuilder(
       future: context.read<AccountProvider>().loadAccount(),
       builder: (context, snapshot) {
+        /// пока данных нет - показывается загрушка шимммер
         if (snapshot.connectionState != ConnectionState.done) {
           return const _AccountProfileShimmer();
         }
 
         final account = context.watch<AccountProvider>().account;
 
+        /// отображает данные
         return Column(
           children: [
             const _AvatarPicker(),
@@ -94,260 +101,7 @@ class _AccountProfile extends StatelessWidget {
   }
 }
 
-class _AccountProfileShimmer extends StatelessWidget {
-  const _AccountProfileShimmer();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Column(
-      children: [
-        ShimmerWidget.circle(width: 118, height: 118),
-        SizedBox(height: 8),
-        ShimmerWidget.rectangular(height: 28, width: 160),
-        SizedBox(height: 8),
-        ShimmerWidget.rectangular(height: 18, width: 60),
-      ],
-    );
-  }
-}
-
-class _AccountStatistic extends StatelessWidget {
-  const _AccountStatistic();
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: context.read<AccountProvider>().loadQuizStatistic(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.done) {
-          return const _AccountStatisticShimmer();
-        }
-        final stats = context.watch<AccountProvider>().quizStat;
-
-        return Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          spacing: 17,
-          children: [
-            _ContainerScope(scope: stats[0], description: "историй пройдено"),
-            _ContainerScope(scope: stats[1], description: "квизов пройдено"),
-          ],
-        );
-      },
-    );
-  }
-}
-
-class _AccountStatisticShimmer extends StatelessWidget {
-  const _AccountStatisticShimmer();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Row(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        spacing: 17,
-        children: [
-          Expanded(child: ShimmerWidget.rectangular(height: 110)),
-          Expanded(child: ShimmerWidget.rectangular(height: 110)),
-        ]);
-  }
-}
-
-class _AccountAchievements extends StatelessWidget {
-  const _AccountAchievements();
-
-  static LinearGradient? _getGradientForIndex(int index, int status) {
-    if (status != 1) return null;
-
-    switch (index % 3) {
-      case 0:
-        return const LinearGradient(
-          begin: Alignment(0.00, 0.50),
-          end: Alignment(1.00, 0.50),
-          colors: [Color(0xFFD1005B), Color(0xFFE8772F)],
-        );
-      case 1:
-        return const LinearGradient(
-          begin: Alignment(0.00, 0.50),
-          end: Alignment(1.00, 0.50),
-          colors: [Color(0xFF411485), Color(0xFF800F44)],
-        );
-      case 2:
-        return const LinearGradient(
-          begin: Alignment(0.00, 0.50),
-          end: Alignment(1.00, 0.50),
-          colors: [Color(0xFFE0902C), Color(0xFFD1005B)],
-        );
-      default:
-        return null;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: context.read<AchievementProvider>().loadAchievements(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.done) {
-          return const ShimmerWidget.rectangular(height: 150);
-        }
-        final achievements = context.watch<AchievementProvider>().achievements;
-
-        return Container(
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-            decoration: ShapeDecoration(
-              shape: RoundedRectangleBorder(
-                side: const BorderSide(
-                  width: 1,
-                  color: Color(0xFF585858),
-                ),
-                borderRadius: BorderRadius.circular(20),
-              ),
-            ),
-            child: Column(
-              children: [
-                Text('Достижения',
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleSmall
-                        ?.copyWith(fontSize: 18)),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  spacing: 20,
-                  children: achievements.asMap().entries.map((entry) {
-                    int index = entry.key;
-                    var achievement = entry.value;
-                    final gradient = _getGradientForIndex(index, achievement.status);
-
-                    return _AchievementWidget(
-                      image: achievement.image,
-                      title: achievement.title,
-                      gradient: achievement.status == 1 ? gradient : null,
-                    );
-                  }).toList(),
-                )
-              ],
-            ));
-      },
-    );
-  }
-}
-
-class _AccountSettings extends StatelessWidget {
-  const _AccountSettings();
-
-  Future<void> _sendSupportEmail() async {
-    final String subject =
-        Uri.encodeComponent('Техподдержка: проблема с приложением');
-    final String body = Uri.encodeComponent(
-        'Здравствуйте, у меня возникла проблема с приложением...');
-
-    final Uri emailUri = Uri.parse(
-        'mailto:programming.creature@gmail.com?subject=$subject&body=$body');
-
-    if (await canLaunchUrl(emailUri)) {
-      await launchUrl(emailUri);
-    } else {
-      throw 'Не удалось открыть почтовое приложение';
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        _RowSettingWidget(
-          prefixIcon: 'assets/icons/setting.svg',
-          title: "Настройки профиля",
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const SettingsScreen()),
-            );
-          },
-        ),
-        _RowSettingWidget(
-          prefixIcon: 'assets/icons/support.svg',
-          title: "Написать в поддержку",
-          onPressed: _sendSupportEmail,
-        ),
-        _RowSettingWidget(
-          prefixIcon: 'assets/icons/about.svg',
-          title: "О приложении",
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const AboutScreen()),
-            );
-          },
-        ),
-        _RowSettingWidget(
-          prefixIcon: 'assets/icons/ic_terms.svg',
-          title: "Условия использования",
-          onPressed: () async {
-            final url = Uri.parse('https://picnic-bk.ru/alex/neoflex_quiz/privacy_policy.html');
-            if (await canLaunchUrl(url)) {
-              await launchUrl(url, mode: LaunchMode.externalApplication);
-            }
-          },
-        ),
-        _RowSettingWidget(
-          prefixIcon: 'assets/icons/ic_policy.svg',
-          title: "Политика конфиденциальности",
-          onPressed: () async {
-            final url = Uri.parse('https://picnic-bk.ru/alex/neoflex_quiz/terms_of_use.html');
-            if (await canLaunchUrl(url)) {
-              await launchUrl(url, mode: LaunchMode.externalApplication);
-            }
-          },
-        ),
-      ],
-    );
-  }
-}
-
-class _AchievementWidget extends StatelessWidget {
-  final String image;
-  final String title;
-  final LinearGradient? gradient;
-
-  const _AchievementWidget(
-      {required this.image,
-      required this.title,
-      required this.gradient});
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-        child: Column(
-      spacing: 8,
-      children: [
-        Container(
-          width: 64,
-          height: 64,
-          decoration: ShapeDecoration(
-            gradient: gradient ??
-                LinearGradient(
-                  colors: [const Color(0xFFF6F6F6), const Color(0xFFF6F6F6)],
-                ),
-            shape: OvalBorder(),
-          ),
-          child: gradient != null
-              ? Padding(
-                  padding: EdgeInsets.all(8),
-                  child: Image.asset(image, width: 48, height: 48))
-              : null,
-        ),
-        Text(title,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.labelSmall)
-      ],
-    ));
-  }
-}
-
+/// класс для отрисовки аватара (иконки)
 class _AvatarPicker extends StatefulWidget {
   const _AvatarPicker();
 
@@ -358,12 +112,15 @@ class _AvatarPicker extends StatefulWidget {
 class _AvatarPickerState extends State<_AvatarPicker> {
   File? _image;
 
+  /// иницализация данных
   @override
   void initState() {
     super.initState();
     _loadImage();
   }
 
+  /// 1. считывает данные из провайдера для получения адреса картинки
+  /// 2. если картинка есть - она загружается в переменную (адрес)
   Future<void> _loadImage() async {
     final provider = context.read<AccountProvider>();
     final path = provider.account.imagePath;
@@ -372,11 +129,18 @@ class _AvatarPickerState extends State<_AvatarPicker> {
     }
   }
 
+  /// сохраняет картинку
+  ///
+  /// 1. Получаю доступ к провайдеру (аккаунту)
+  /// 2. Создаю имя файла
+  /// 3. Компрессирую фотографию для меньшего качества
+  /// 4. Сохраняю фото в локальное хранилище
+  /// 5. Обновляю переменную в бд
   Future<void> _pickImage() async {
     final provider = context.read<AccountProvider>();
 
     final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+    await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile == null) return;
 
     final directory = await getApplicationDocumentsDirectory();
@@ -452,7 +216,7 @@ class _AvatarPickerState extends State<_AvatarPicker> {
                     width: 10,
                     height: 10,
                     colorFilter:
-                        ColorFilter.mode(Colors.white, BlendMode.srcIn)),
+                    ColorFilter.mode(Colors.white, BlendMode.srcIn)),
               ),
             ),
           )
@@ -462,6 +226,56 @@ class _AvatarPickerState extends State<_AvatarPicker> {
   }
 }
 
+/// виджет заглушка для профиля
+class _AccountProfileShimmer extends StatelessWidget {
+  const _AccountProfileShimmer();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      children: [
+        ShimmerWidget.circle(width: 118, height: 118),
+        SizedBox(height: 8),
+        ShimmerWidget.rectangular(height: 28, width: 160),
+        SizedBox(height: 8),
+        ShimmerWidget.rectangular(height: 18, width: 60),
+      ],
+    );
+  }
+}
+
+/// виджет блок со статистикой
+class _AccountStatistic extends StatelessWidget {
+  const _AccountStatistic();
+
+  @override
+  Widget build(BuildContext context) {
+    /// загрузка данных по статистике пройденных квизов и историй
+    return FutureBuilder(
+      future: context.read<AccountProvider>().loadQuizStatistic(),
+      builder: (context, snapshot) {
+        /// пока данных нет- заглушка
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const _AccountStatisticShimmer();
+        }
+        final stats = context.watch<AccountProvider>().quizStat;
+
+        /// отображение контента
+        return Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          spacing: 17,
+          children: [
+            _ContainerScope(scope: stats[0], description: "историй пройдено"),
+            _ContainerScope(scope: stats[1], description: "квизов пройдено"),
+          ],
+        );
+      },
+    );
+  }
+}
+
+/// виджет статистики
 class _ContainerScope extends StatelessWidget {
   final int scope;
   final String description;
@@ -505,6 +319,230 @@ class _ContainerScope extends StatelessWidget {
   }
 }
 
+/// виджет заглушка для статистики
+class _AccountStatisticShimmer extends StatelessWidget {
+  const _AccountStatisticShimmer();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        spacing: 17,
+        children: [
+          Expanded(child: ShimmerWidget.rectangular(height: 110)),
+          Expanded(child: ShimmerWidget.rectangular(height: 110)),
+        ]);
+  }
+}
+
+/// виджет с достижениями
+class _AccountAchievements extends StatelessWidget {
+  const _AccountAchievements();
+
+  /// метод для получения нужного градиента по индексу
+  static LinearGradient? _getGradientForIndex(int index, int status) {
+    if (status != 1) return null;
+
+    switch (index % 3) {
+      case 0:
+        return const LinearGradient(
+          begin: Alignment(0.00, 0.50),
+          end: Alignment(1.00, 0.50),
+          colors: [Color(0xFFD1005B), Color(0xFFE8772F)],
+        );
+      case 1:
+        return const LinearGradient(
+          begin: Alignment(0.00, 0.50),
+          end: Alignment(1.00, 0.50),
+          colors: [Color(0xFF411485), Color(0xFF800F44)],
+        );
+      case 2:
+        return const LinearGradient(
+          begin: Alignment(0.00, 0.50),
+          end: Alignment(1.00, 0.50),
+          colors: [Color(0xFFE0902C), Color(0xFFD1005B)],
+        );
+      default:
+        return null;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    /// загрузка данных по достижениям
+    return FutureBuilder(
+      future: context.read<AchievementProvider>().loadAchievements(),
+      builder: (context, snapshot) {
+        /// заглушка пока нет данных
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const ShimmerWidget.rectangular(height: 150);
+        }
+        final achievements = context.watch<AchievementProvider>().achievements;
+
+        /// постройка контента
+        return Container(
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+            decoration: ShapeDecoration(
+              shape: RoundedRectangleBorder(
+                side: const BorderSide(
+                  width: 1,
+                  color: Color(0xFF585858),
+                ),
+                borderRadius: BorderRadius.circular(20),
+              ),
+            ),
+            child: Column(
+              children: [
+                Text('Достижения',
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleSmall
+                        ?.copyWith(fontSize: 18)),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  spacing: 20,
+                  children: achievements.asMap().entries.map((entry) {
+                    int index = entry.key;
+                    var achievement = entry.value;
+                    final gradient = _getGradientForIndex(index, achievement.status);
+
+                    return _AchievementWidget(
+                      image: achievement.image,
+                      title: achievement.title,
+                      gradient: achievement.status == 1 ? gradient : null,
+                    );
+                  }).toList(),
+                )
+              ],
+            ));
+      },
+    );
+  }
+}
+
+/// виджет достижения
+class _AchievementWidget extends StatelessWidget {
+  final String image;
+  final String title;
+  final LinearGradient? gradient;
+
+  const _AchievementWidget(
+      {required this.image,
+        required this.title,
+        required this.gradient});
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+        child: Column(
+          spacing: 8,
+          children: [
+            Container(
+              width: 64,
+              height: 64,
+              decoration: ShapeDecoration(
+                gradient: gradient ??
+                    LinearGradient(
+                      colors: [const Color(0xFFF6F6F6), const Color(0xFFF6F6F6)],
+                    ),
+                shape: OvalBorder(),
+              ),
+              child: gradient != null
+                  ? Padding(
+                  padding: EdgeInsets.all(8),
+                  child: Image.asset(image, width: 48, height: 48))
+                  : null,
+            ),
+            Text(title,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.labelSmall)
+          ],
+        ));
+  }
+}
+
+/// виджет с основными настройками
+class _AccountSettings extends StatelessWidget {
+  const _AccountSettings();
+
+  /// метод для отправки письма в техподдержку
+  ///
+  /// здесь происходит переход в приложение, если оно имеется на телефоне,
+  /// а затем происходит ввод шаблона, который можно отредактировать и отправить.
+  /// после отправки игрок возвращается назад в приложение.
+  Future<void> _sendSupportEmail() async {
+    final String subject =
+        Uri.encodeComponent('Техподдержка: проблема с приложением');
+    final String body = Uri.encodeComponent(
+        'Здравствуйте, у меня возникла проблема с приложением...');
+
+    final Uri emailUri = Uri.parse(
+        'mailto:programming.creature@gmail.com?subject=$subject&body=$body');
+
+    if (await canLaunchUrl(emailUri)) {
+      await launchUrl(emailUri);
+    } else {
+      throw 'Не удалось открыть почтовое приложение';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        _RowSettingWidget(
+          prefixIcon: 'assets/icons/setting.svg',
+          title: "Настройки профиля",
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const SettingsScreen()),
+            );
+          },
+        ),
+        _RowSettingWidget(
+          prefixIcon: 'assets/icons/support.svg',
+          title: "Написать в поддержку",
+          onPressed: _sendSupportEmail,
+        ),
+        _RowSettingWidget(
+          prefixIcon: 'assets/icons/about.svg',
+          title: "О приложении",
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const AboutScreen()),
+            );
+          },
+        ),
+        _RowSettingWidget(
+          prefixIcon: 'assets/icons/ic_terms.svg',
+          title: "Условия использования",
+          onPressed: () async {
+            final url = Uri.parse('https://picnic-bk.ru/alex/neoflex_quiz/privacy_policy.html');
+            if (await canLaunchUrl(url)) {
+              await launchUrl(url, mode: LaunchMode.externalApplication);
+            }
+          },
+        ),
+        _RowSettingWidget(
+          prefixIcon: 'assets/icons/ic_policy.svg',
+          title: "Политика конфиденциальности",
+          onPressed: () async {
+            final url = Uri.parse('https://picnic-bk.ru/alex/neoflex_quiz/terms_of_use.html');
+            if (await canLaunchUrl(url)) {
+              await launchUrl(url, mode: LaunchMode.externalApplication);
+            }
+          },
+        ),
+      ],
+    );
+  }
+}
+
+/// виджет строчки с настройками
 class _RowSettingWidget extends StatelessWidget {
   final String prefixIcon;
   final String title;
@@ -531,12 +569,12 @@ class _RowSettingWidget extends StatelessWidget {
               child: Row(
                 children: [
                   SvgPicture.asset(prefixIcon, width: 32, height: 32),
-                  const SizedBox(width: 12), // Добавьте отступ для красоты
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       title,
                       style: Theme.of(context).textTheme.bodySmall,
-                      softWrap: true, // Включите перенос текста
+                      softWrap: true,
                     ),
                   ),
                 ],

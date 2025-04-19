@@ -3,6 +3,10 @@ import 'package:flutter_svg/svg.dart';
 
 import 'count_monet.dart';
 
+/// модернизированный scaffold
+///
+/// используется почти на всех страницах.
+/// есть вариации со стрелочкой и заголовком и без
 class BaseScaffold extends StatelessWidget {
   final Widget body;
   final bool showLeading;

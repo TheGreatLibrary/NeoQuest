@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import '../database/data_based_helper.dart';
 import '../database/models/account.dart';
 
+/// логика управления аккаунтом по всем страницам
 class AccountProvider with ChangeNotifier {
   final _dbHelper = DatabaseHelper();
   late Account _account;
@@ -11,6 +12,7 @@ class AccountProvider with ChangeNotifier {
   Account get account => _account;
   List<int> get quizStat => _quizStat;
 
+  /// загрузка данных по статистике
   Future<void> loadQuizStatistic() async {
     final cards = await _dbHelper.getCards();
     int story = 0;
@@ -29,16 +31,19 @@ class AccountProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  /// загрузка данных аккаунта
   Future<void> loadAccount() async {
     _account = (await _dbHelper.getAccount());
     notifyListeners();
   }
 
+  /// получение аккаунта
   Future<Account> getAccount() async {
     await loadAccount();
     return account;
   }
 
+  /// создание аккаунта
   Future<bool> createAccount(String name, int age) async {
     final newAccount = Account(nickname: name, age: age);
     final result = await _dbHelper.insertOrUpdateAccount(newAccount);
@@ -50,6 +55,7 @@ class AccountProvider with ChangeNotifier {
     return false;
   }
 
+  /// замена диалогов в истории с добавлением nickname
   Future<void> replaceStoryDialogs(String name) async {
     final dialogs = await _dbHelper.getStoryDialogs(1);
 
@@ -70,6 +76,7 @@ class AccountProvider with ChangeNotifier {
     }
   }
 
+  /// обновление полей аккаунта
   Future<int> updateAccountFields({
     String? nickname,
     int? age,

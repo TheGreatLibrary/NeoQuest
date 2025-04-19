@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// стоимость товара
 class PriceMonet extends StatelessWidget {
   final String title;
   final String text;

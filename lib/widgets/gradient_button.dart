@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// градиентная кнопка, используется по всему приложению
 class GradientButton extends StatelessWidget {
   final VoidCallback onPressed;
   final String buttonText;

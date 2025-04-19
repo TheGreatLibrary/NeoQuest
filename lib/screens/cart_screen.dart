@@ -13,6 +13,7 @@ import '../widgets/delay_loading_image.dart';
 import '../widgets/shimmer_widget.dart';
 import 'order_placement_screen.dart';
 
+/// экран корзины
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
 
@@ -85,6 +86,7 @@ class CartScreen extends StatelessWidget {
   }
 }
 
+/// список из заглушек
 class _CartListShimmer extends StatelessWidget {
   const _CartListShimmer();
 
@@ -105,6 +107,7 @@ class _CartListShimmer extends StatelessWidget {
   }
 }
 
+/// карточка товара в корзине
 class _CartItemWidget extends StatelessWidget {
   final CartProvider cartProvider;
   final CartItem item;
@@ -114,7 +117,9 @@ class _CartItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    /// получение провайдера продуктов
     final productProvider = context.read<ProductProvider>();
+    /// получение ширины и высоты экрана для адаптивности картинки под экран
     final imageWidth = MediaQuery.of(context).size.width * 0.43;
     final imageHeight = MediaQuery.of(context).size.height * 0.16;
 
@@ -231,6 +236,7 @@ class _CartItemWidget extends StatelessWidget {
     );
   }
 
+  /// сообщение о превышении лимита товара в корзине
   void _showMaxSnackBar(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -247,6 +253,7 @@ class _CartItemWidget extends StatelessWidget {
   }
 }
 
+/// виджет с кнопкой + и -
 class _QuantityButton extends StatefulWidget {
   final String symbol;
   final VoidCallback onPressed;
@@ -266,6 +273,8 @@ class _QuantityButtonState extends State<_QuantityButton> {
   Timer? _timer;
   int _interval = 100;
 
+  /// ускорение таймера при долгом нажатии, чтобы быстрее увеличивать
+  /// число товаров (или уменьшать)
   void _startHolding() {
     widget.onLongPress();
     _interval = 100;
@@ -281,6 +290,7 @@ class _QuantityButtonState extends State<_QuantityButton> {
     });
   }
 
+  /// остановка таймера
   void _stopHolding() {
     _timer?.cancel();
     _timer = null;

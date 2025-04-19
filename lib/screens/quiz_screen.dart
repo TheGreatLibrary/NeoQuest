@@ -7,6 +7,11 @@ import 'package:provider/provider.dart';
 import '../database/models/question.dart';
 import '../providers/quiz_provider.dart';
 
+/// класс для работы с викториной
+///
+/// данные берутся из провайдера.
+/// пока их нет - показывается шиммер-заглушка
+/// если вопроса нет - то пишется информация об этом
 class QuizScreen extends StatelessWidget {
   final String title;
   final int id;
@@ -47,6 +52,7 @@ class QuizScreen extends StatelessWidget {
   }
 }
 
+/// виджет для создания самого вопроса с вариантами ответов
 class _QuestionWidget extends StatefulWidget {
   final Question question;
   final VoidCallback onNext;
@@ -214,6 +220,7 @@ class _QuestionWidgetState extends State<_QuestionWidget> {
   }
 }
 
+/// шиммер заглушка для вопроса
 class _QuestionShimmer extends StatelessWidget {
   const _QuestionShimmer();
 

@@ -9,7 +9,7 @@ import '../providers/quiz_cards_provider.dart';
 import '../widgets/delay_loading_image.dart';
 import '../widgets/gradient_text.dart';
 
-
+/// главная страница приложения, здесь расположена дорожная карта с квизами и историями
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -20,6 +20,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   static const _cardAssets = _CardAssets();
 
+  /// инициализация данных по квизам
   @override
   void initState() {
     super.initState();
@@ -30,6 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    /// получение карточек квизов
     final cards = context.select<QuizCardsProvider, List<QuizCards>>((provider) => provider.cards);
 
     return SafeArea(
@@ -52,6 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
+/// градиенты, наклоны картинок и размеры
 class _CardAssets {
   final List<String> imagePaths = const [
     'assets/image/card1.png',
@@ -92,6 +95,7 @@ class _CardAssets {
   const _CardAssets();
 }
 
+/// шапка страницы
 class _Header extends StatelessWidget {
   const _Header();
 
@@ -116,6 +120,7 @@ class _Header extends StatelessWidget {
   }
 }
 
+/// заглушка список
 class _LoadingCardList extends StatelessWidget {
   const _LoadingCardList();
 
@@ -130,6 +135,7 @@ class _LoadingCardList extends StatelessWidget {
   }
 }
 
+/// заглушка карточка
 class _ShimmerCard extends StatelessWidget {
   const _ShimmerCard();
 
@@ -142,6 +148,7 @@ class _ShimmerCard extends StatelessWidget {
   }
 }
 
+/// список карточек
 class _GameCardList extends StatelessWidget {
   final List<QuizCards> cards;
 
@@ -165,6 +172,7 @@ class _GameCardList extends StatelessWidget {
   }
 }
 
+/// карточка квиза
 class _GameCard extends StatelessWidget {
   final int quizId;
   final List<Color> gradientColors;
@@ -181,6 +189,9 @@ class _GameCard extends StatelessWidget {
     required this.width,
   });
 
+  /// метод для перехода на страницу по ее state
+  ///
+  /// если карточка еще не открыта, ее пройти нельзя
   void _handleCardTap(BuildContext context, QuizCards card) {
     if (card.state == 1 || card.state == 2) {
       Navigator.push(
@@ -258,6 +269,7 @@ class _GameCard extends StatelessWidget {
     );
   }
 
+  /// получение статуса карточки (иконка)
   String _getStatusIconPath(int state) {
     return switch (state) {
       0 => 'assets/icons/ic_status_block.svg',
@@ -268,6 +280,7 @@ class _GameCard extends StatelessWidget {
   }
 }
 
+/// подвал списка
 class _Footer extends StatelessWidget {
   const _Footer();
 

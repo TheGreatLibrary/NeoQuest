@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../widgets/base_scaffold.dart';
 import '../widgets/custom_text_field.dart';
 
+/// виджет страницы с редактированием аккаунта
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
@@ -31,11 +32,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
     super.dispose();
   }
 
+  /// кнопка валидации заполненных полей
+  ///
+  /// 1. получаю данные с аккаунта
+  /// 2. обрезаю пробелы с полей
+  /// 3. проверяю поля
+  /// 4.1 если ошибки есть - показываю error
+  /// 4.2 фокус переношу
+  /// 5. если проблем нет - обновляем данные
   Future<void> _validateAndSubmit() async {
     final provider = context.read<AccountProvider>();
     String name = _usernameController.text.trim();
     String ageText = _ageController.text.trim();
 
+    /// имя от 2 символов
+    /// возраст от 6 до 140
     int? age = int.tryParse(ageText);
     bool isNameValid = name.isEmpty || name.length >= 2;
     bool isAgeValid =
@@ -54,6 +65,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       return;
     }
 
+    /// если поля пустые, надо уведомить, что надо хоть что-то написать или выйти
     if (name.isEmpty && ageText.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -98,6 +110,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     loadTextField();
   }
 
+  /// заполняет поля тем, что уже есть в аккаунте
   void loadTextField() async {
     final provider = context.read<AccountProvider>();
     final account = provider.account;
@@ -109,6 +122,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    /// переменная для отслеживания появления клавиатуры и скрытия кнопки
     bool isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
 
     return BaseScaffold(

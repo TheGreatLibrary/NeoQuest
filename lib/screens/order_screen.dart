@@ -11,6 +11,7 @@ import '../providers/orders_provider.dart';
 import '../widgets/delay_loading_image.dart';
 import '../widgets/shimmer_widget.dart';
 
+/// страница с заказами
 class OrdersScreen extends StatefulWidget {
   const OrdersScreen({super.key});
 
@@ -19,6 +20,7 @@ class OrdersScreen extends StatefulWidget {
 }
 
 class _OrdersScreenState extends State<OrdersScreen> {
+  /// инициализация и обновление списка с заказами
   @override
   void initState() {
     super.initState();
@@ -29,6 +31,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
 
   @override
   Widget build(BuildContext context) {
+    /// подписка на чтение данные с провайдера заказов
     final ordersProvider = context.read<OrdersProvider>();
 
     return BaseScaffold(
@@ -42,35 +45,33 @@ class _OrdersScreenState extends State<OrdersScreen> {
           onRefresh: () async {
             await ordersProvider.checkAndUpdateOrders();
           },
-          child: Consumer<OrdersProvider>(
-            builder: (context, provider, _) {
-              if (provider.isLoading && provider.orders.isEmpty) {
-                return const _ShimmerOrderList();
-              }
-
-              if (provider.orders.isEmpty) {
-                Center(child: Text("Заказов нет"));
-              }
-
-              return ListView.builder(
-                itemCount: provider.orders.length,
-                padding: const EdgeInsets.only(top: 24),
-                itemBuilder: (context, index) {
-                  final order = provider.orders[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: _OrderItem(order: order),
-                  );
-                },
-              );
-            },
-          ),
+          child: ordersProvider.isLoading
+              ? const _ShimmerOrderList()
+              : ordersProvider.orders.isEmpty
+                  ? const Center(child: Text("Заказов нет"))
+                  : Consumer<OrdersProvider>(
+                      builder: (context, provider, _) {
+                        /// список заказов
+                        return ListView.builder(
+                          itemCount: provider.orders.length,
+                          padding: const EdgeInsets.only(top: 24),
+                          itemBuilder: (context, index) {
+                            final order = provider.orders[index];
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 16),
+                              child: _OrderItem(order: order),
+                            );
+                          },
+                        );
+                      },
+                    ),
         ),
       ),
     );
   }
 }
 
+/// виджет заказа
 class _OrderItem extends StatefulWidget {
   final Order order;
 
@@ -83,17 +84,24 @@ class _OrderItem extends StatefulWidget {
 }
 
 class _OrderItemState extends State<_OrderItem> {
+  /// список товаров в заказе
   List<OrderItemWithProduct> items = [];
+
+  /// раскрыт или нет - состояние
   bool isExpanded = false;
+
+  /// процесс загрузки данных
   bool isLoading = false;
 
+  /// инициализация данных по определенному заказу
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      isLoading = true;
       items =
           await context.read<OrdersProvider>().loadItemByOrder(widget.order.id);
-      isLoading = true;
+      isLoading = false;
     });
   }
 
@@ -159,6 +167,7 @@ class _OrderItemState extends State<_OrderItem> {
     );
   }
 
+  /// получение статуса заказа
   String getStatus() {
     String status = widget.order.status;
     switch (status) {
@@ -172,12 +181,14 @@ class _OrderItemState extends State<_OrderItem> {
   }
 }
 
+/// список товаров заказа
 class _OrderItemList extends StatelessWidget {
   final List<OrderItemWithProduct> items;
   final Order order;
 
   const _OrderItemList({required this.items, required this.order});
 
+  /// метод для копирования номера трека при нажатии на трек
   Future<void> copyTrack(BuildContext context) async {
     await Clipboard.setData(ClipboardData(text: order.trackingNumber));
     ScaffoldMessenger.of(context).showSnackBar(
@@ -231,6 +242,7 @@ class _OrderItemList extends StatelessWidget {
   }
 }
 
+/// виджет товара в заказе
 class _OrderItemListWidget extends StatelessWidget {
   final OrderItemWithProduct item;
 
@@ -238,6 +250,7 @@ class _OrderItemListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    /// читает данные провайдера
     final productProvider = context.read<ProductProvider>();
 
     return Container(
@@ -319,6 +332,7 @@ class _OrderItemListWidget extends StatelessWidget {
   }
 }
 
+/// заглушка списка товаров
 class _ShimmerOrderList extends StatelessWidget {
   const _ShimmerOrderList();
 

@@ -3,6 +3,7 @@ import 'package:neoflex_quiz/widgets/price_monet.dart';
 
 import 'gradient_button.dart';
 
+/// кнопка с данными по заказу в корзине и офорфмлении заказов
 class CustomBottomBar extends StatelessWidget {
   final int totalPrice;
   final VoidCallback onPressed;
