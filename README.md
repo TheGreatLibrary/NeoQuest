@@ -32,7 +32,7 @@
 
 1. Клонируйте репозиторий:
    ```bash
-   git clone https://github.com/твое_имя/NeoQuest.git
+   git clone https://github.com/TheGreatLibrary/NeoQuest.git
 2. Перейдите в каталог:
    ```bash
    cd NeoQuest
